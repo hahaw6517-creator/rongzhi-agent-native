@@ -1,0 +1,1437 @@
+{
+  "data": {
+    "company_name": "佛山市海天调味食品股份有限公司",
+    "industry": "食品制造业（调味品）",
+    "region": "广东佛山",
+    "security_code": "603288",
+    "listing_market": "SH",
+    "listing_status": "A股",
+    "input_contract": "annual-v3",
+    "public_source": "真实算例：海天味业2023—2025年公开合并财报（逐项核对）",
+    "total_assets": 52183944926.12,
+    "total_liabilities": 10344267800.4,
+    "current_assets": 37983734459.01,
+    "current_liabilities": 9853410137.2,
+    "ending_equity": 41839677125.72,
+    "cash_and_equivalents": 24603677724.73,
+    "accounts_receivable": 295624145.05,
+    "inventory": 2407715424.0,
+    "accounts_payable": 1505924425.92,
+    "prepayments": 127741500.26,
+    "contract_liabilities": 4128488829.61,
+    "short_term_debt": 140850000.0,
+    "current_portion_long_term_debt": 77674512.86,
+    "fixed_assets": 5223472094.73,
+    "revenue": 28873380466.76,
+    "cost_of_goods_sold": 17259677561.22,
+    "net_profit": 7045452349.14,
+    "operating_profit": 8664302204.25,
+    "income_tax_expense": 1549969780.28,
+    "selling_expense": 1933186180.86,
+    "administrative_expense": 700003187.19,
+    "research_expense": 914986298.3,
+    "finance_expense": -456025062.63,
+    "taxes_surcharges": 247914584.69,
+    "operating_cash_flow": 7745950953.79,
+    "capital_expenditure": 1283601482.19,
+    "cash_equivalents_balance": 9545499792.61,
+    "historical_debt_repayment": 363664953.68,
+    "net_investing_cash_flow": -13729756148.54,
+    "net_financing_cash_flow": 3663437208.07,
+    "cash_effect_fx": -49885551.78,
+    "opening_cash_equivalents": 11915753331.07,
+    "interest_expense": 25520066.67,
+    "depreciation_expense": 778128975.32,
+    "amortization_expense": 27976792.86,
+    "advance_receipts": 0.0,
+    "long_term_debt": 0.0,
+    "restricted_cash": 11610946.82,
+    "statement_schema": "public-v2",
+    "report_period": "2025年度",
+    "financial_history": [
+      {
+        "year": 2023,
+        "values": {
+          "total_assets": 38423518405.62,
+          "total_liabilities": 9390542813.5,
+          "current_assets": 30774419278.23,
+          "current_liabilities": 8936237742.28,
+          "ending_equity": 29032975592.12,
+          "cash_and_equivalents": 21689385461.71,
+          "accounts_receivable": 223149082.18,
+          "inventory": 2618773147.0,
+          "accounts_payable": 1403494596.12,
+          "prepayments": 19263482.34,
+          "contract_liabilities": 4527027103.06,
+          "short_term_debt": 362645734.42,
+          "current_portion_long_term_debt": 31344563.21,
+          "fixed_assets": 4609123277.41,
+          "revenue": 24559312356.59,
+          "cost_of_goods_sold": 16028535574.92,
+          "net_profit": 5642186761.43,
+          "operating_profit": 6744787667.43,
+          "income_tax_expense": 1096850567.11,
+          "selling_expense": 1305746731.57,
+          "administrative_expense": 525684478.72,
+          "research_expense": 715417649.71,
+          "finance_expense": -585131598.77,
+          "taxes_surcharges": 194010627.83,
+          "operating_cash_flow": 7355650997.74,
+          "capital_expenditure": 1924147446.25,
+          "cash_equivalents_balance": 12841080497.02,
+          "historical_debt_repayment": 296768944.0,
+          "net_investing_cash_flow": -819999258.89,
+          "net_financing_cash_flow": -2850631924.42,
+          "cash_effect_fx": 4025648.79,
+          "opening_cash_equivalents": 9152035033.8,
+          "interest_expense": 11887538.28,
+          "depreciation_expense": 873192523.12,
+          "amortization_expense": 28199635.81,
+          "advance_receipts": 0.0,
+          "long_term_debt": 70270400.0,
+          "restricted_cash": 17923646.74
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 77,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "total_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 78,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 76,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 78,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "ending_equity": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 78,
+            "caption": "所有者权益（或股东权益）合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 76,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_receivable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 76,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "inventory": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 76,
+            "caption": "存货",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_payable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 77,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "prepayments": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 76,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "contract_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 77,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "short_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 77,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 78,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "fixed_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 77,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "revenue": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "其中：营业收入",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "其中：营业成本",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 82,
+            "caption": "五、净利润（净亏损以“－”号填列）",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 82,
+            "caption": "三、营业利润（亏损以“－”号填列）",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "income_tax_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 82,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "selling_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "administrative_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "research_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "finance_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 86,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "capital_expenditure": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 86,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 87,
+            "caption": "六、期末现金及现金等价物余额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 86,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 86,
+            "caption": "投资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 87,
+            "caption": "筹资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 87,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 87,
+            "caption": "加：期初现金及现金等价物余额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "interest_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 81,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "depreciation_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 172,
+            "caption": "固定资产折旧、油气资产折耗、生产性生物资产折旧",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "amortization_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 172,
+            "caption": "无形资产摊销",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "advance_receipts": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 154,
+            "caption": "附注37预收款项：不适用",
+            "unit": "元",
+            "verification": "附注明确不适用，非缺失补零"
+          },
+          "long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 78,
+            "caption": "长期借款（不含一年内到期部分）",
+            "unit": "元",
+            "verification": "2025年附注45核对，其余合并资产负债表原值"
+          },
+          "restricted_cash": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+            "page": 152,
+            "caption": "附注31受限货币资金",
+            "unit": "元",
+            "verification": "官方年报原文核对"
+          }
+        },
+        "source": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF"
+      },
+      {
+        "year": 2024,
+        "values": {
+          "total_assets": 40875062220.95,
+          "total_liabilities": 9479053899.65,
+          "current_assets": 32852769477.81,
+          "current_liabilities": 9005796072.2,
+          "ending_equity": 31396008321.3,
+          "cash_and_equivalents": 22123657928.03,
+          "accounts_receivable": 242260969.75,
+          "inventory": 2525279032.45,
+          "accounts_payable": 1360229054.27,
+          "prepayments": 34392068.04,
+          "contract_liabilities": 4335313046.53,
+          "short_term_debt": 293464953.68,
+          "current_portion_long_term_debt": 30769896.77,
+          "fixed_assets": 5059723298.49,
+          "revenue": 26904508894.01,
+          "cost_of_goods_sold": 16956814477.84,
+          "net_profit": 6355361477.12,
+          "operating_profit": 7506081239.67,
+          "income_tax_expense": 1157221392.81,
+          "selling_expense": 1628600567.28,
+          "administrative_expense": 579793272.25,
+          "research_expense": 846815791.26,
+          "finance_expense": -509134949.5,
+          "taxes_surcharges": 227591025.0,
+          "operating_cash_flow": 6840201569.11,
+          "capital_expenditure": 1576229554.19,
+          "cash_equivalents_balance": 11915753331.07,
+          "historical_debt_repayment": 465360609.51,
+          "net_investing_cash_flow": -3772319783.47,
+          "net_financing_cash_flow": -4002395201.43,
+          "cash_effect_fx": 579984.46,
+          "opening_cash_equivalents": 12849686762.4,
+          "interest_expense": 23960973.48,
+          "depreciation_expense": 851883494.87,
+          "amortization_expense": 31465008.53,
+          "advance_receipts": 0.0,
+          "long_term_debt": 33200000.0,
+          "restricted_cash": 8392658.79
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "total_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 88,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "ending_equity": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 88,
+            "caption": "所有者权益（或股东权益）合计",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_receivable": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "inventory": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "存货",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_payable": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "prepayments": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "contract_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "short_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "fixed_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "revenue": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "其中：营业收入",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "其中：营业成本",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_profit": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "五、净利润（净亏损以“－”号填列）",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_profit": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "三、营业利润（亏损以“－”号填列）",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "income_tax_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "selling_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "administrative_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "research_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "finance_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 94,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "capital_expenditure": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "六、期末现金及现金等价物余额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "投资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "筹资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "加：期初现金及现金等价物余额",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "interest_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "depreciation_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 174,
+            "caption": "固定资产折旧、油气资产折耗、生产性生物资产折旧",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "amortization_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 174,
+            "caption": "无形资产摊销",
+            "unit": "元",
+            "column": "上期比较数",
+            "verification": "官方合并年报原文核对"
+          },
+          "advance_receipts": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 156,
+            "caption": "附注37预收款项：不适用",
+            "unit": "元",
+            "verification": "附注明确不适用，非缺失补零"
+          },
+          "long_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 160,
+            "caption": "长期借款（不含一年内到期部分）",
+            "unit": "元",
+            "verification": "2025年附注45核对，其余合并资产负债表原值"
+          },
+          "restricted_cash": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 154,
+            "caption": "附注31受限货币资金",
+            "unit": "元",
+            "verification": "官方年报原文核对"
+          }
+        },
+        "source": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf"
+      },
+      {
+        "year": 2025,
+        "values": {
+          "total_assets": 52183944926.12,
+          "total_liabilities": 10344267800.4,
+          "current_assets": 37983734459.01,
+          "current_liabilities": 9853410137.2,
+          "ending_equity": 41839677125.72,
+          "cash_and_equivalents": 24603677724.73,
+          "accounts_receivable": 295624145.05,
+          "inventory": 2407715424.0,
+          "accounts_payable": 1505924425.92,
+          "prepayments": 127741500.26,
+          "contract_liabilities": 4128488829.61,
+          "short_term_debt": 140850000.0,
+          "current_portion_long_term_debt": 77674512.86,
+          "fixed_assets": 5223472094.73,
+          "revenue": 28873380466.76,
+          "cost_of_goods_sold": 17259677561.22,
+          "net_profit": 7045452349.14,
+          "operating_profit": 8664302204.25,
+          "income_tax_expense": 1549969780.28,
+          "selling_expense": 1933186180.86,
+          "administrative_expense": 700003187.19,
+          "research_expense": 914986298.3,
+          "finance_expense": -456025062.63,
+          "taxes_surcharges": 247914584.69,
+          "operating_cash_flow": 7745950953.79,
+          "capital_expenditure": 1283601482.19,
+          "cash_equivalents_balance": 9545499792.61,
+          "historical_debt_repayment": 363664953.68,
+          "net_investing_cash_flow": -13729756148.54,
+          "net_financing_cash_flow": 3663437208.07,
+          "cash_effect_fx": -49885551.78,
+          "opening_cash_equivalents": 11915753331.07,
+          "interest_expense": 25520066.67,
+          "depreciation_expense": 778128975.32,
+          "amortization_expense": 27976792.86,
+          "advance_receipts": 0.0,
+          "long_term_debt": 0.0,
+          "restricted_cash": 11610946.82
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "total_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 88,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "ending_equity": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 88,
+            "caption": "所有者权益（或股东权益）合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_receivable": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "inventory": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "存货",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "accounts_payable": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "prepayments": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "contract_liabilities": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "short_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 87,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "fixed_assets": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 86,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "revenue": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "其中：营业收入",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "其中：营业成本",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_profit": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "五、净利润（净亏损以“－”号填列）",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_profit": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "三、营业利润（亏损以“－”号填列）",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "income_tax_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "selling_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "administrative_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "research_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "finance_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 90,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 94,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "capital_expenditure": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "六、期末现金及现金等价物余额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "投资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "筹资活动产生的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 95,
+            "caption": "加：期初现金及现金等价物余额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "interest_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 91,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "depreciation_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 174,
+            "caption": "固定资产折旧、油气资产折耗、生产性生物资产折旧",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "amortization_expense": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 174,
+            "caption": "无形资产摊销",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并年报原文核对"
+          },
+          "advance_receipts": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 156,
+            "caption": "附注37预收款项：不适用",
+            "unit": "元",
+            "verification": "附注明确不适用，非缺失补零"
+          },
+          "long_term_debt": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 160,
+            "caption": "长期借款（不含一年内到期部分）",
+            "unit": "元",
+            "verification": "2025年附注45核对，其余合并资产负债表原值"
+          },
+          "restricted_cash": {
+            "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+            "page": 154,
+            "caption": "附注31受限货币资金",
+            "unit": "元",
+            "verification": "官方年报原文核对"
+          }
+        },
+        "source": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf"
+      }
+    ],
+    "public_provenance": {
+      "total_assets": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "资产总计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "total_liabilities": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 88,
+        "caption": "负债合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "current_assets": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "流动资产合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "current_liabilities": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "流动负债合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "ending_equity": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 88,
+        "caption": "所有者权益（或股东权益）合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "cash_and_equivalents": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "货币资金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "accounts_receivable": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "应收账款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "inventory": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "存货",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "accounts_payable": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "应付账款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "prepayments": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "预付款项",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "contract_liabilities": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "合同负债",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "short_term_debt": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "短期借款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "current_portion_long_term_debt": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 87,
+        "caption": "一年内到期的非流动负债",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "fixed_assets": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 86,
+        "caption": "固定资产",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "revenue": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "其中：营业收入",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "cost_of_goods_sold": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "其中：营业成本",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "net_profit": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 91,
+        "caption": "五、净利润（净亏损以“－”号填列）",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "operating_profit": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 91,
+        "caption": "三、营业利润（亏损以“－”号填列）",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "income_tax_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 91,
+        "caption": "减：所得税费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "selling_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "销售费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "administrative_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "管理费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "research_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "研发费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "finance_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "财务费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "taxes_surcharges": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 90,
+        "caption": "税金及附加",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "operating_cash_flow": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 94,
+        "caption": "经营活动产生的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "capital_expenditure": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "cash_equivalents_balance": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "六、期末现金及现金等价物余额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "historical_debt_repayment": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "偿还债务支付的现金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "net_investing_cash_flow": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "投资活动产生的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "net_financing_cash_flow": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "筹资活动产生的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "cash_effect_fx": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "四、汇率变动对现金及现金等价物的影响",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "opening_cash_equivalents": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 95,
+        "caption": "加：期初现金及现金等价物余额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "interest_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 91,
+        "caption": "其中：利息费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "depreciation_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 174,
+        "caption": "固定资产折旧、油气资产折耗、生产性生物资产折旧",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "amortization_expense": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 174,
+        "caption": "无形资产摊销",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并年报原文核对"
+      },
+      "advance_receipts": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 156,
+        "caption": "附注37预收款项：不适用",
+        "unit": "元",
+        "verification": "附注明确不适用，非缺失补零"
+      },
+      "long_term_debt": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 160,
+        "caption": "长期借款（不含一年内到期部分）",
+        "unit": "元",
+        "verification": "2025年附注45核对，其余合并资产负债表原值"
+      },
+      "restricted_cash": {
+        "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+        "page": 154,
+        "caption": "附注31受限货币资金",
+        "unit": "元",
+        "verification": "官方年报原文核对"
+      }
+    },
+    "beginning_total_assets": 40875062220.95,
+    "beginning_equity": 31396008321.3,
+    "beginning_accounts_receivable": 242260969.75,
+    "beginning_inventory": 2525279032.45,
+    "beginning_accounts_payable": 1360229054.27,
+    "beginning_prepayments": 34392068.04,
+    "beginning_advance_receipts": 0.0,
+    "prior_contract_liabilities": 4335313046.53,
+    "prior_revenue": 26904508894.01,
+    "prior_net_profit": 6355361477.12,
+    "prior_operating_cash_flow": 6840201569.11,
+    "prior_capital_expenditure": 1576229554.19
+  },
+  "profile": {
+    "requested_amount": 300000000.0,
+    "requested_months": 36,
+    "requested_purpose": "设备购置",
+    "decision_engine": "enterprise-v3",
+    "enterprise_type": "一般企业",
+    "objective": "测试假设：为设备更新安排3亿元外部净融资，期限36个月。评估是否有必要新增借款，并比较抵押贷款与设备租赁的成本、偿付压力及现金安全边界。"
+  },
+  "title": "海天味业 · 三年真实财报",
+  "description": "2023—2025年合并财报；设备更新净融资3亿元、36个月（需求为测试假设）",
+  "notes": [
+    "2024、2025年取自2025年年报；2023年取自2024年年报比较列。2024年比较数据因同一控制下合并重述，2023年未据此自行追溯重编，跨该边界的变化包含口径影响。",
+    "金额均为人民币元；净利润为合并净利润，非归母净利润；货币资金与现金及现金等价物余额分别保留。",
+    "融资需求、未来利率、费用及资产融资比例属于演示假设；企业现金充足，不能据演示需求认定其缺钱或必须借款。"
+  ],
+  "sources": [
+    {
+      "year": 2025,
+      "url": "https://static.haday.com/upload/2026/03/27/e862e415c60546c899815c5a61da233f.pdf",
+      "sha256": "2c7fba45257decc8edc4a0d8462c51accf146593f8c6097b26ed5ad52cf4115e"
+    },
+    {
+      "year": 2024,
+      "url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222994233.PDF",
+      "sha256": "5a97b13534438f5e85249752ef492fbd9e23af73e67845e47bad1ab7d92e20ee"
+    }
+  ]
+}

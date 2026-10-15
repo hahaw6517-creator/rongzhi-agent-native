@@ -1,0 +1,1336 @@
+{
+  "data": {
+    "company_name": "江苏宁沪高速公路股份有限公司",
+    "industry": "交通运输业（收费公路）",
+    "region": "江苏南京",
+    "security_code": "600377",
+    "listing_market": "SH",
+    "listing_status": "A股",
+    "input_contract": "annual-v3",
+    "public_source": "官方年报逐项核对：江苏宁沪高速公路股份有限公司2023—2025年合并财报",
+    "total_assets": 96388991421.56,
+    "total_liabilities": 41408028894.22,
+    "current_assets": 6747066333.45,
+    "current_liabilities": 11476151749.38,
+    "ending_equity": 54980962527.34,
+    "cash_and_equivalents": 611258728.57,
+    "accounts_receivable": 2099610033.45,
+    "inventory": 1876223486.59,
+    "accounts_payable": 3763410581.34,
+    "prepayments": 9677343.79,
+    "advance_receipts": 38339499.49,
+    "contract_liabilities": 6796539.94,
+    "short_term_debt": 500298915.78,
+    "long_term_debt": 19651587235.39,
+    "current_portion_long_term_debt": 2734581085.7,
+    "fixed_assets": 7838822495.74,
+    "revenue": 20289199757.75,
+    "cost_of_goods_sold": 14188011306.93,
+    "net_profit": 4821418256.3,
+    "operating_profit": 6139940139.5,
+    "income_tax_expense": 1284153481.21,
+    "selling_expense": 5746711.72,
+    "administrative_expense": 282051123.81,
+    "research_expense": 91823.92,
+    "finance_expense": 832187227.06,
+    "taxes_surcharges": 88660130.47,
+    "operating_cash_flow": 6761638748.35,
+    "capital_expenditure": 7626330153.97,
+    "cash_equivalents_balance": 605164768.62,
+    "historical_debt_repayment": 17336015508.15,
+    "net_investing_cash_flow": -5321893803.84,
+    "net_financing_cash_flow": -1678066461.56,
+    "cash_effect_fx": 0.0,
+    "opening_cash_equivalents": 843486285.67,
+    "interest_expense": 838994863.39,
+    "statement_schema": "public-v2",
+    "report_period": "2025年度",
+    "financial_history": [
+      {
+        "year": 2023,
+        "values": {
+          "total_assets": 78661443944.36,
+          "total_liabilities": 37772936068.68,
+          "current_assets": 8736772595.02,
+          "current_liabilities": 9549438432.72,
+          "ending_equity": 40888507875.68,
+          "cash_and_equivalents": 862161074.06,
+          "accounts_receivable": 1650030300.22,
+          "inventory": 2238246666.22,
+          "accounts_payable": 2694620290.31,
+          "prepayments": 6112638.02,
+          "advance_receipts": 21398050.68,
+          "contract_liabilities": 39662422.59,
+          "short_term_debt": 1003987152.92,
+          "long_term_debt": 19449100982.09,
+          "current_portion_long_term_debt": 3031210204.68,
+          "fixed_assets": 7595044911.05,
+          "revenue": 15192010226.04,
+          "cost_of_goods_sold": 9580684804.43,
+          "net_profit": 4609625167.8,
+          "operating_profit": 5697779577.69,
+          "income_tax_expense": 1062649445.98,
+          "selling_expense": 10026993.87,
+          "administrative_expense": 283506233.5,
+          "research_expense": 0.0,
+          "finance_expense": 1126370193.34,
+          "taxes_surcharges": 53378012.08,
+          "operating_cash_flow": 7392424081.75,
+          "capital_expenditure": 3804376752.41,
+          "cash_equivalents_balance": 833603529.89,
+          "historical_debt_repayment": 21774738025.23,
+          "net_investing_cash_flow": -2878558544.55,
+          "net_financing_cash_flow": -4605274861.8,
+          "cash_effect_fx": 0.0,
+          "opening_cash_equivalents": 925012854.49,
+          "interest_expense": 1076088753.42
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "total_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "ending_equity": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 152,
+            "caption": "股东权益合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_receivable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "inventory": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "存货",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_payable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "prepayments": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "advance_receipts": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "预收款项",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "contract_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "short_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "长期借款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 151,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "fixed_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 150,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "revenue": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "一、营业收入",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "减：营业成本",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "四、净利润",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "二、营业利润",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "income_tax_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "selling_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "administrative_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "research_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "合并利润表未列该费用项目；研发投入章节明确不适用；按报表单列研发费用零值保留，不解释为所有技术支出为零",
+            "note_page": 24
+          },
+          "finance_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 160,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "capital_expenditure": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 160,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 161,
+            "caption": "六、年末现金及现金等价物余额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 161,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 160,
+            "caption": "投资活动使用的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 161,
+            "caption": "筹资活动产生/(使用)的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 161,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "合并现金流量表两列均明确列示横线（零）"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 161,
+            "caption": "加：年初现金及现金等价物余额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "interest_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+            "page": 156,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          }
+        },
+        "source": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF"
+      },
+      {
+        "year": 2024,
+        "values": {
+          "total_assets": 89886075247.13,
+          "total_liabilities": 40152087126.76,
+          "current_assets": 8393695629.27,
+          "current_liabilities": 16186507091.14,
+          "ending_equity": 49733988120.37,
+          "cash_and_equivalents": 864469970.43,
+          "accounts_receivable": 1863284456.59,
+          "inventory": 1999541489.81,
+          "accounts_payable": 2040453228.14,
+          "prepayments": 8689460.92,
+          "advance_receipts": 21516884.93,
+          "contract_liabilities": 29162546.02,
+          "short_term_debt": 400281112.0,
+          "long_term_debt": 19357819529.59,
+          "current_portion_long_term_debt": 8690666769.08,
+          "fixed_assets": 7275660965.82,
+          "revenue": 23198204414.58,
+          "cost_of_goods_sold": 17101001522.62,
+          "net_profit": 5170407061.54,
+          "operating_profit": 6340198826.31,
+          "income_tax_expense": 1146418310.91,
+          "selling_expense": 5943654.82,
+          "administrative_expense": 298604867.79,
+          "research_expense": 0.0,
+          "finance_expense": 956660179.31,
+          "taxes_surcharges": 119441513.52,
+          "operating_cash_flow": 6316202433.54,
+          "capital_expenditure": 10802287566.02,
+          "cash_equivalents_balance": 843486285.67,
+          "historical_debt_repayment": 19038754701.9,
+          "net_investing_cash_flow": -9387552676.04,
+          "net_financing_cash_flow": 3081232998.28,
+          "cash_effect_fx": 0.0,
+          "opening_cash_equivalents": 833603529.89,
+          "interest_expense": 963483489.08
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "total_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "ending_equity": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 146,
+            "caption": "股东权益合计",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_receivable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "inventory": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "存货",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_payable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "prepayments": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "advance_receipts": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "预收款项",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "contract_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "short_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "长期借款",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "fixed_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "revenue": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "一、营业收入",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "减：营业成本",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "四、净利润",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "二、营业利润",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "income_tax_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "selling_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "administrative_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "research_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "2025年合并利润表原值；2024年比较列明确横线（零）"
+          },
+          "finance_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "capital_expenditure": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "六、年末现金及现金等价物余额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "投资活动使用的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "筹资活动(使用)/产生的现金流量净额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "合并现金流量表两列均明确列示横线（零）"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "加：年初现金及现金等价物余额",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          },
+          "interest_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "比较期",
+            "verification": "官方合并财报原值"
+          }
+        },
+        "source": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF"
+      },
+      {
+        "year": 2025,
+        "values": {
+          "total_assets": 96388991421.56,
+          "total_liabilities": 41408028894.22,
+          "current_assets": 6747066333.45,
+          "current_liabilities": 11476151749.38,
+          "ending_equity": 54980962527.34,
+          "cash_and_equivalents": 611258728.57,
+          "accounts_receivable": 2099610033.45,
+          "inventory": 1876223486.59,
+          "accounts_payable": 3763410581.34,
+          "prepayments": 9677343.79,
+          "advance_receipts": 38339499.49,
+          "contract_liabilities": 6796539.94,
+          "short_term_debt": 500298915.78,
+          "long_term_debt": 19651587235.39,
+          "current_portion_long_term_debt": 2734581085.7,
+          "fixed_assets": 7838822495.74,
+          "revenue": 20289199757.75,
+          "cost_of_goods_sold": 14188011306.93,
+          "net_profit": 4821418256.3,
+          "operating_profit": 6139940139.5,
+          "income_tax_expense": 1284153481.21,
+          "selling_expense": 5746711.72,
+          "administrative_expense": 282051123.81,
+          "research_expense": 91823.92,
+          "finance_expense": 832187227.06,
+          "taxes_surcharges": 88660130.47,
+          "operating_cash_flow": 6761638748.35,
+          "capital_expenditure": 7626330153.97,
+          "cash_equivalents_balance": 605164768.62,
+          "historical_debt_repayment": 17336015508.15,
+          "net_investing_cash_flow": -5321893803.84,
+          "net_financing_cash_flow": -1678066461.56,
+          "cash_effect_fx": 0.0,
+          "opening_cash_equivalents": 843486285.67,
+          "interest_expense": 838994863.39
+        },
+        "provenance": {
+          "total_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "资产总计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "total_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "负债合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "current_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "流动资产合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "current_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "流动负债合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "ending_equity": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 146,
+            "caption": "股东权益合计",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_and_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "货币资金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_receivable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "应收账款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "inventory": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "存货",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "accounts_payable": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "应付账款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "prepayments": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "预付款项",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "advance_receipts": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "预收款项",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "contract_liabilities": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "合同负债",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "short_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "短期借款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "长期借款",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "current_portion_long_term_debt": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 145,
+            "caption": "一年内到期的非流动负债",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "fixed_assets": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 144,
+            "caption": "固定资产",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "revenue": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "一、营业收入",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "cost_of_goods_sold": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "减：营业成本",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "net_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "四、净利润",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_profit": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "二、营业利润",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "income_tax_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "减：所得税费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "selling_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "销售费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "administrative_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "管理费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "research_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "研发费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "2025年合并利润表原值；2024年比较列明确横线（零）"
+          },
+          "finance_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "财务费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "taxes_surcharges": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "税金及附加",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "operating_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "经营活动产生的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "capital_expenditure": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_equivalents_balance": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "六、年末现金及现金等价物余额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "historical_debt_repayment": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "偿还债务支付的现金",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "net_investing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 154,
+            "caption": "投资活动使用的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "net_financing_cash_flow": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "筹资活动(使用)/产生的现金流量净额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "cash_effect_fx": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "四、汇率变动对现金及现金等价物的影响",
+            "unit": "元",
+            "column": "本期",
+            "verification": "合并现金流量表两列均明确列示横线（零）"
+          },
+          "opening_cash_equivalents": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 155,
+            "caption": "加：年初现金及现金等价物余额",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          },
+          "interest_expense": {
+            "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+            "page": 150,
+            "caption": "其中：利息费用",
+            "unit": "元",
+            "column": "本期",
+            "verification": "官方合并财报原值"
+          }
+        },
+        "source": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF"
+      }
+    ],
+    "public_provenance": {
+      "total_assets": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "资产总计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "total_liabilities": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "负债合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "current_assets": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "流动资产合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "current_liabilities": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "流动负债合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "ending_equity": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 146,
+        "caption": "股东权益合计",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "cash_and_equivalents": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "货币资金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "accounts_receivable": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "应收账款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "inventory": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "存货",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "accounts_payable": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "应付账款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "prepayments": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "预付款项",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "advance_receipts": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "预收款项",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "contract_liabilities": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "合同负债",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "short_term_debt": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "短期借款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "long_term_debt": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "长期借款",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "current_portion_long_term_debt": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 145,
+        "caption": "一年内到期的非流动负债",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "fixed_assets": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 144,
+        "caption": "固定资产",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "revenue": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "一、营业收入",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "cost_of_goods_sold": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "减：营业成本",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "net_profit": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "四、净利润",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "operating_profit": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "二、营业利润",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "income_tax_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "减：所得税费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "selling_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "销售费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "administrative_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "管理费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "research_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "研发费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "2025年合并利润表原值；2024年比较列明确横线（零）"
+      },
+      "finance_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "财务费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "taxes_surcharges": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "税金及附加",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "operating_cash_flow": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 154,
+        "caption": "经营活动产生的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "capital_expenditure": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 154,
+        "caption": "购建固定资产、无形资产和其他长期资产支付的现金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "cash_equivalents_balance": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 155,
+        "caption": "六、年末现金及现金等价物余额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "historical_debt_repayment": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 155,
+        "caption": "偿还债务支付的现金",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "net_investing_cash_flow": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 154,
+        "caption": "投资活动使用的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "net_financing_cash_flow": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 155,
+        "caption": "筹资活动(使用)/产生的现金流量净额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "cash_effect_fx": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 155,
+        "caption": "四、汇率变动对现金及现金等价物的影响",
+        "unit": "元",
+        "column": "本期",
+        "verification": "合并现金流量表两列均明确列示横线（零）"
+      },
+      "opening_cash_equivalents": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 155,
+        "caption": "加：年初现金及现金等价物余额",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      },
+      "interest_expense": {
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+        "page": 150,
+        "caption": "其中：利息费用",
+        "unit": "元",
+        "column": "本期",
+        "verification": "官方合并财报原值"
+      }
+    },
+    "beginning_total_assets": 89886075247.13,
+    "beginning_equity": 49733988120.37,
+    "beginning_accounts_receivable": 1863284456.59,
+    "beginning_inventory": 1999541489.81,
+    "beginning_accounts_payable": 2040453228.14,
+    "beginning_prepayments": 8689460.92,
+    "beginning_advance_receipts": 21516884.93,
+    "prior_contract_liabilities": 29162546.02,
+    "prior_revenue": 23198204414.58,
+    "prior_net_profit": 5170407061.54,
+    "prior_operating_cash_flow": 6316202433.54,
+    "prior_capital_expenditure": 10802287566.02
+  },
+  "role": "demo",
+  "title": "江苏宁沪高速公路股份有限公司 · 三年真实财报",
+  "description": "2023—2025年官方合并财报；融资需求另列为演示假设",
+  "notes": [
+    "2025、2024取自2025年年报本期及比较列；2023取自2024年年报比较列。",
+    "原始数据保留人民币元；页面和Excel以亿元展示，净利润使用合并净利润，不使用归母净利润。",
+    "附注未取到的可选数据留空，不填造假数值。",
+    "两份年报重叠2024年核心字段核对一致。"
+  ],
+  "sources": [
+    {
+      "year": 2025,
+      "url": "https://static.cninfo.com.cn/finalpage/2026-03-30/1225049417.PDF",
+      "sha256": "a185fb617d26aa746d81ab256873af0de903fb8625b5e3c3da8754cd20d76411"
+    },
+    {
+      "year": 2024,
+      "url": "https://static.cninfo.com.cn/finalpage/2025-03-27/1222912237.PDF",
+      "sha256": "b412b8d092e118efd75acbb8323e41c69b56494cec43e159cb57ac71f951e899"
+    }
+  ]
+}

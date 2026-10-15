@@ -1,0 +1,18 @@
+{
+  "version": "market-rules-1.0",
+  "description": "融资研究场景知识库。以下为项目情景设计，不是实证预测系数或银行授信标准。",
+  "sectors": [
+    {"id": "manufacturing", "name": "制造业", "keywords": ["制造", "机械", "汽车", "电子", "精密", "加工", "半导体"], "search_term": "制造业", "exposures": ["订单及回款周期", "存货占用", "设备资本支出"], "metrics": ["receivables_days", "inventory_days", "dscr"]},
+    {"id": "trade", "name": "贸易零售", "keywords": ["贸易", "零售", "批发", "电商", "商贸"], "search_term": "批发零售", "exposures": ["采购备货", "销售回款", "季节性资金缺口"], "metrics": ["inventory_days", "gross_profit_margin", "dscr"]},
+    {"id": "construction", "name": "建筑工程", "keywords": ["建筑", "工程", "施工", "房地产"], "search_term": "建筑业", "exposures": ["工程结算回款", "保证金占用", "短贷长用"], "metrics": ["receivables_days", "operating_cash_flow_margin", "dscr"]},
+    {"id": "technology", "name": "科技服务", "keywords": ["软件", "信息", "科技", "研发", "技术服务"], "search_term": "科技企业", "exposures": ["研发支出", "轻资产担保不足", "客户回款"], "metrics": ["operating_cash_flow_margin", "net_profit_margin", "dscr"]},
+    {"id": "agriculture", "name": "农业食品", "keywords": ["农业", "养殖", "种植", "食品", "农产品"], "search_term": "农业企业", "exposures": ["生产周期", "价格波动", "库存及销售现金流"], "metrics": ["inventory_days", "gross_profit_margin", "dscr"]}
+  ],
+  "rules": [
+    {"id": "MR-01", "kind": "payment_delay", "label": "回款环境承压", "cues": ["回款放缓", "回款周期延长", "账期延长", "拖欠账款", "应收账款增加", "应收账款回收期延长"], "cash_drop_floor": 0.25, "financial_gate": "receivables_days", "reason": "行业或地区回款压力与本企业应收占用并存，增加现金流下行情景；25%为项目预设敏感性档位。"},
+    {"id": "MR-02", "kind": "demand_weakness", "label": "订单需求承压", "cues": ["订单下降", "新订单指数下降", "订单减少", "需求不足", "需求收缩", "景气回落"], "cash_drop_floor": 0.25, "financial_gate": "revenue", "reason": "需求压力通过销售与回款影响偿债现金流，采用25%情景；不将新闻中的订单跌幅直接等同CFADS跌幅。"},
+    {"id": "MR-03", "kind": "credit_tightening", "label": "融资环境收紧", "cues": ["信贷收紧", "融资成本上升", "融资成本上行", "授信收缩", "贷款利率上升"], "rate_up_floor": 0.015, "financial_gate": "revenue", "reason": "融资环境收紧时增加利率敏感性至上行1.5个百分点；不冒充实际报价，不扣减已确认额度。"}
+  ],
+  "combination_rule": "MR-01与MR-02同时通过证据和财务暴露校验时，CFADS下行情景设为30%；重复转载或同一风险多篇报道不累加。",
+  "peer_rule": "上市公司授信公告只是可比机制案例；没有同地区、同细分行业、同规模、同期间及真实合同成本的样本，不计算同行平均融资利率或获批概率。"
+}

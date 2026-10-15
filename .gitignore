@@ -1,0 +1,37 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.streamlit/secrets.toml
+.coverage
+tmp/
+data/runtime.sqlite3*
+data/runtime.db*
+output/
+
+# Local duplicate, private state, and generated workbook previews.
+/融智agent/
+.env.*
+!.env.example
+*.sqlite*
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.xlsx.top.png
+*.xlsx.bottom.png
+*.xlsx.inspect.ndjson
+.agents/
+.codex/
+
+# Official public workbooks required by the website's case-download routes.
+!output/
+output/*
+!output/真实企业案例/
+output/真实企业案例/*
+!output/真实企业案例/已验证演示/
+!output/真实企业案例/未运行测试/
+output/真实企业案例/已验证演示/*
+output/真实企业案例/未运行测试/*
+!output/真实企业案例/已验证演示/*.xlsx
+!output/真实企业案例/未运行测试/*.xlsx
