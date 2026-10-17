@@ -41,20 +41,3 @@ def test_adjustment_rejects_arbitrary_fields_and_keeps_market_pressure_basis():
     run["outputs"]["analyze_industry_region"]["market_decision"]={"changed":True,"portfolio":base}
     result=preview_adjustment(run,{"cash_flow_available_for_debt_service":2e6})
     assert result["plan"]["algorithm"]["planning_stress"]==dict(cash_drop=.3,rate_up=.02)
-
-
-def test_adjustment_form_runs_in_workspace_but_not_report():
-    from streamlit.testing.v1 import AppTest
-    run=case("风险分析")
-    app=AppTest.from_file("../app.py",default_timeout=20).run()
-    app.session_state["runs"]=[run]
-    app.session_state["active_run_id"]=run["id"]
-    app.session_state["task_checklists"]={run["id"]:run["outputs"]["prepare_deliverables"]["tasks"]}
-    app.switch_page("app_pages/solutions.py").run()
-    next(n for n in app.number_input if n.label=="试算年度还款现金（万元）").set_value(10.)
-    next(b for b in app.button if b.label=="计算调整后的结果").click().run()
-    assert not app.exception
-    assert app.session_state["adjustment_result_"+run["id"]]["focus"]["risk"]["threshold"]["cash_improvement"]>0
-    assert app.session_state["runs"][0]==run
-    app.switch_page("app_pages/delivery.py").run()
-    assert not any(b.label=="计算调整后的结果" for b in app.button)

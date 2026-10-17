@@ -130,7 +130,7 @@ def test_web_conversation_remembers_clarification_without_updating_report(tmp_pa
         def __init__(self,*args,**kwargs):
             super().__init__(*args,**kwargs,client=ScriptedClient([[('explore_financing',dict(edits=[edit('requested_amount',1000000000,'yuan',q)]))]]))
     monkeypatch.setattr(chat,'DecisionConversation',Agent)
-    monkeypatch.setattr(api,'load_settings',lambda:SETTINGS)
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:SETTINGS)
     with TestClient(api.create_app(database_path=tmp_path/'dialogue.db')) as client:
         client.get('/api/bootstrap')
         start=client.post('/api/runs',json={'profile':{'requested_amount':300000000},'use_ai':False})

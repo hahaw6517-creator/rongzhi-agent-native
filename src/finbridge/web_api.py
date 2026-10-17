@@ -12,6 +12,7 @@ from copy import deepcopy
 import csv
 import io
 import json
+import logging
 import math
 import os
 from pathlib import Path
@@ -35,11 +36,20 @@ from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Route
 
 from finbridge.agent import FinancialAgent, AgentConfigurationError, AgentRequestError
-from finbridge.config import load_settings
 from finbridge.data import load_uploaded_financial_data
 from finbridge.data import FIELD_CATALOG
 from finbridge.template import financial_template_xlsx, financial_template_csv
 from finbridge.task_agent import run_task_agent
+from finbridge.secret_box import SecretBox, generate_master_key
+from finbridge.model_resolver import resolve_llm_settings
+from finbridge.web_auth import (
+    AuthStore, auth_captcha, auth_register, auth_login, auth_me,
+    ai_providers, ai_models, ai_model_item, ai_model_select, ai_model_test,
+    ai_platform_select, ai_platform_remove, ai_history, ai_history_item,
+    admin_ai_providers, admin_ai_provider_item, admin_platform_models,
+    admin_platform_model_item, admin_platform_model_test, jwt_verify,
+    admin_users, admin_user_reset_password, admin_user_status, admin_user_delete,
+)
 from finbridge.workflow import (
     DATA_FIELDS, GOALS, KNOWLEDGE, LABELS, TOOLS, DiligenceRun, check_data,
     clean_data, delivery_zip, fingerprint, report_html, report_markdown,
@@ -201,8 +211,7 @@ class SessionStore:
                     id TEXT PRIMARY KEY, session_id TEXT NOT NULL,
                     created REAL NOT NULL, running INTEGER NOT NULL DEFAULT 0,
                     result TEXT NOT NULL, tasks TEXT NOT NULL DEFAULT '[]',
-                    reviewed INTEGER NOT NULL DEFAULT 0,
-                    FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                    reviewed INTEGER NOT NULL DEFAULT 0
                 );
                 CREATE INDEX IF NOT EXISTS session_runs ON runs(session_id, created DESC);
                 CREATE TABLE IF NOT EXISTS decision_chats (
@@ -215,7 +224,25 @@ class SessionStore:
                     PRIMARY KEY(root_id,session_id),
                     FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE
                 );
+                CREATE TABLE IF NOT EXISTS app_meta (
+                    key TEXT PRIMARY KEY, value TEXT NOT NULL
+                );
             """)
+            # 账户级历史分析：runs 增加 user_id 归属（登录用户跨会话可见），去掉外键级联防止清理会话时误删账户记录
+            run_columns = {row["name"] for row in db.execute("PRAGMA table_info(runs)").fetchall()}
+            if "user_id" not in run_columns:
+                db.executescript("""
+                    CREATE TABLE runs_migrated (
+                        id TEXT PRIMARY KEY, session_id TEXT NOT NULL, user_id INTEGER,
+                        created REAL NOT NULL, running INTEGER NOT NULL DEFAULT 0,
+                        result TEXT NOT NULL, tasks TEXT NOT NULL DEFAULT '[]',
+                        reviewed INTEGER NOT NULL DEFAULT 0
+                    );
+                    INSERT INTO runs_migrated SELECT id,session_id,NULL,created,running,result,tasks,reviewed FROM runs;
+                    DROP TABLE runs;
+                    ALTER TABLE runs_migrated RENAME TO runs;
+                """)
+            db.execute("CREATE INDEX IF NOT EXISTS user_runs ON runs(user_id, created DESC)")
             # Work cannot silently remain in progress after a process restart.
             for row in db.execute("SELECT id,result FROM runs WHERE running=1").fetchall():
                 result = json.loads(row["result"])
@@ -231,6 +258,8 @@ class SessionStore:
     def session(self, token: str | None) -> tuple[str, dict[str, Any], bool]:
         now = time.time()
         with self.lock, self.connect() as db:
+            # 会话过期清理：账户级分析记录（user_id 非空）不受影响，匿名记录随会话删除
+            db.execute("DELETE FROM runs WHERE user_id IS NULL AND session_id NOT IN (SELECT id FROM sessions)")
             db.execute("DELETE FROM sessions WHERE touched < ? AND id NOT IN (SELECT session_id FROM runs WHERE running=1)", (now - SESSION_SECONDS,))
             db.execute("DELETE FROM decision_workspace WHERE session_id NOT IN (SELECT id FROM sessions)")
             row = db.execute("SELECT state FROM sessions WHERE id=?", (token,)).fetchone() if token and re.fullmatch(r"[a-f0-9]{64}", token) else None
@@ -249,6 +278,8 @@ class SessionStore:
                 oldest = db.execute("SELECT id FROM sessions WHERE id NOT IN (SELECT session_id FROM runs WHERE running=1) ORDER BY touched LIMIT 1").fetchone()
                 if not oldest:
                     raise _error("当前访问人数较多，请稍后重试", 503)
+                # 被淘汰会话中的账户级分析记录保留，仅会话状态删除
+                db.execute("UPDATE runs SET session_id='orphan' WHERE session_id=? AND user_id IS NOT NULL", (oldest["id"],))
                 db.execute("DELETE FROM sessions WHERE id=?", (oldest["id"],))
             token = secrets.token_hex(32)
             data = _read_demos()[0]
@@ -263,6 +294,12 @@ class SessionStore:
             raise _error("会话已过期，请刷新页面", 401)
         return json.loads(row["state"])
 
+    def has_running(self, token: str, uid: int | None = None) -> bool:
+        # 该浏览器会话或登录账户是否有执行中的分析任务
+        where, params = self._owner_where(token, uid)
+        with self.connect() as db:
+            return bool(db.execute(f"SELECT 1 FROM runs WHERE running=1 AND {where} LIMIT 1", params).fetchone())
+
     def update(self, token: str, **changes: Any) -> dict[str, Any]:
         with self.lock, self.connect() as db:
             row = db.execute("SELECT state FROM sessions WHERE id=?", (token,)).fetchone()
@@ -273,9 +310,71 @@ class SessionStore:
             db.execute("UPDATE sessions SET state=?,touched=? WHERE id=?", (_json(state), time.time(), token))
             return state
 
-    def list_runs(self, token: str) -> list[dict[str, Any]]:
+    # ---- API 模型管理（平台托管 scope=platform / 用户自配 scope=user）----
+
+    def secret_key(self) -> str:
+        # 加密主密钥：环境变量 FINBRIDGE_ENC_KEY 优先；未设置时首次生成并落库 app_meta
+        env = (os.getenv("FINBRIDGE_ENC_KEY") or "").strip()
+        if env:
+            return env
+        with self.lock, self.connect() as db:
+            row = db.execute("SELECT value FROM app_meta WHERE key='enc_key'").fetchone()
+            if row:
+                return row["value"]
+            key = generate_master_key()
+            db.execute("INSERT OR REPLACE INTO app_meta(key,value) VALUES ('enc_key',?)", (key,))
+            return key
+
+    def secret_box(self) -> SecretBox:
+        return SecretBox(self.secret_key())
+
+    @staticmethod
+    def _owner_where(token: str, uid: int | None) -> tuple[str, list]:
+        # 可见范围：本会话记录 + 登录账户的记录（匿名时仅本会话）
+        if uid is None:
+            return "session_id=?", [token]
+        return "(session_id=? OR user_id=?)", [token, uid]
+
+    def claim_runs_for_user(self, uid: int) -> int:
+        # 启动回填：无归属记录归属管理员，并与该账户名下已有记录按企业合并去重，每企业仅保留最新一条
+        with self.lock, self.connect() as db:
+            rows = db.execute(
+                "SELECT id,result,user_id FROM runs WHERE user_id IS NULL OR user_id=? ORDER BY created DESC", (uid,)
+            ).fetchall()
+            claimed, seen = 0, set()
+            for row in rows:
+                company = (json.loads(row["result"]).get("data") or {}).get("company_name") or ""
+                if not company:
+                    continue  # 无企业名的记录不参与去重，无归属的留待会话过期清理
+                if company in seen:
+                    db.execute("DELETE FROM runs WHERE id=?", (row["id"],))
+                    continue
+                seen.add(company)
+                if row["user_id"] is None:
+                    db.execute("UPDATE runs SET user_id=? WHERE id=?", (uid, row["id"]))
+                    claimed += 1
+            return claimed
+
+    def drop_duplicate_runs(self, token: str, company: str, uid: int | None = None) -> None:
+        # 案例重复载入时替换同企业的未复核分析，保持每个企业在历史分析中仅一份最新记录；已复核的视为正式资产不替换
+        where, params = self._owner_where(token, uid)
+        with self.lock, self.connect() as db:
+            rows = db.execute(f"SELECT id,result,reviewed FROM runs WHERE running=0 AND {where}", params).fetchall()
+            for row in rows:
+                result = json.loads(row["result"])
+                if not row["reviewed"] and (result.get("data") or {}).get("company_name") == company:
+                    db.execute("DELETE FROM runs WHERE id=?", (row["id"],))
+
+    def claim_run(self, token: str, run_id: str, uid: int | None = None) -> bool:
+        # 历史分析恢复：将记录改绑到当前会话与登录账户，后续进度保存与更新正常归属
+        with self.lock, self.connect() as db:
+            cursor = db.execute("UPDATE runs SET session_id=?,user_id=? WHERE id=?", (token, uid, run_id))
+            return cursor.rowcount > 0
+
+    def list_runs(self, token: str, uid: int | None = None) -> list[dict[str, Any]]:
         with self.connect() as db:
-            rows = db.execute("SELECT result,tasks,reviewed FROM runs WHERE session_id=? ORDER BY created DESC", (token,)).fetchall()
+            where, params = self._owner_where(token, uid)
+            rows = db.execute(f"SELECT result,tasks,reviewed FROM runs WHERE {where} ORDER BY created DESC", params).fetchall()
         state = self.state(token)
         return [self._decorate(row, state) for row in rows]
 
@@ -304,17 +403,19 @@ class SessionStore:
                 result["report_brief"] = build_report_brief(result)
         return result
 
-    def run(self, token: str, run_id: str) -> dict[str, Any]:
+    def run(self, token: str, run_id: str, uid: int | None = None) -> dict[str, Any]:
+        where, params = self._owner_where(token, uid)
         with self.connect() as db:
-            row = db.execute("SELECT result,tasks,reviewed FROM runs WHERE id=? AND session_id=?", (run_id, token)).fetchone()
+            row = db.execute(f"SELECT result,tasks,reviewed FROM runs WHERE id=? AND {where}", [run_id, *params]).fetchone()
         if not row:
-            raise _error("任务不存在或不属于当前浏览器会话", 404)
+            raise _error("任务不存在或不属于当前会话", 404)
         return self._decorate(row, self.state(token))
 
-    def add_run(self, token: str, profile: dict[str, Any], goal: str, use_ai: bool) -> DiligenceRun:
+    def add_run(self, token: str, profile: dict[str, Any], goal: str, use_ai: bool, uid: int | None = None) -> DiligenceRun:
         with self.lock, self.connect() as db:
-            if db.execute("SELECT COUNT(*) FROM runs WHERE running=1 AND session_id=?", (token,)).fetchone()[0]:
-                raise _error("本浏览器已有任务正在执行，请等待完成", 409)
+            where, params = self._owner_where(token, uid)
+            if db.execute(f"SELECT COUNT(*) FROM runs WHERE running=1 AND {where}", params).fetchone()[0]:
+                raise _error("当前已有任务正在执行，请等待完成", 409)
             if db.execute("SELECT COUNT(*) FROM runs WHERE running=1").fetchone()[0] >= MAX_RUNNING:
                 raise _error("当前任务较多，请稍后重试", 429)
             row = db.execute("SELECT state FROM sessions WHERE id=?", (token,)).fetchone()
@@ -326,23 +427,27 @@ class SessionStore:
                 run.result["mode"] = "AI 自主规划"
             state.update(profile=deepcopy(profile), active_run_id=run.result["id"])
             db.execute("UPDATE sessions SET state=? WHERE id=?", (_json(state), token))
-            db.execute("INSERT INTO runs(id,session_id,created,running,result) VALUES (?,?,?,?,?)", (run.result["id"], token, time.time(), 1, _json(run.result)))
-            db.execute("DELETE FROM runs WHERE session_id=? AND id NOT IN (SELECT id FROM runs WHERE session_id=? ORDER BY created DESC LIMIT ?)", (token, token, MAX_RUNS))
+            db.execute("INSERT INTO runs(id,session_id,user_id,created,running,result) VALUES (?,?,?,?,?,?)", (run.result["id"], token, uid, time.time(), 1, _json(run.result)))
+            # 裁剪上限覆盖本会话与本账户的记录，避免误删其他会话中同一账户的历史
+            where, params = self._owner_where(token, uid)
+            db.execute(f"DELETE FROM runs WHERE {where} AND id NOT IN (SELECT id FROM runs WHERE {where} ORDER BY created DESC LIMIT ?)", [*params, *params, MAX_RUNS])
             return run
 
-    def save_progress(self, token: str, result: dict[str, Any], *, finished: bool = False):
+    def save_progress(self, token: str, result: dict[str, Any], *, finished: bool = False, uid: int | None = None):
+        where, params = self._owner_where(token, uid)
         with self.lock, self.connect() as db:
             tasks = deepcopy(result.get("outputs", {}).get("prepare_deliverables", {}).get("tasks", []))
             if finished:
-                db.execute("UPDATE runs SET result=?,running=0,tasks=? WHERE id=? AND session_id=?", (_json(result), _json(tasks), result["id"], token))
+                db.execute(f"UPDATE runs SET result=?,running=0,tasks=? WHERE id=? AND {where}", (_json(result), _json(tasks), result["id"], *params))
             else:
-                db.execute("UPDATE runs SET result=? WHERE id=? AND session_id=?", (_json(result), result["id"], token))
+                db.execute(f"UPDATE runs SET result=? WHERE id=? AND {where}", (_json(result), result["id"], *params))
 
-    def patch_run(self, token: str, run_id: str, payload: dict[str, Any]):
+    def patch_run(self, token: str, run_id: str, payload: dict[str, Any], uid: int | None = None):
+        where, params = self._owner_where(token, uid)
         with self.lock, self.connect() as db:
-            row = db.execute("SELECT tasks,reviewed,running FROM runs WHERE id=? AND session_id=?", (run_id, token)).fetchone()
+            row = db.execute(f"SELECT tasks,reviewed,running FROM runs WHERE id=? AND {where}", [run_id, *params]).fetchone()
             if not row:
-                raise _error("任务不存在或不属于当前浏览器会话", 404)
+                raise _error("任务不存在或不属于当前会话", 404)
             if row["running"]:
                 raise _error("任务执行中，请完成后更新行动进度", 409)
             tasks, reviewed = json.loads(row["tasks"]), bool(row["reviewed"])
@@ -359,21 +464,30 @@ class SessionStore:
                     if not isinstance(patch, dict) or set(patch) != {"id", "completed"} or not isinstance(patch["id"], str) or patch["id"] not in task_map or not isinstance(patch["completed"], bool):
                         raise _error("行动编号或完成状态无效")
                     task_map[patch["id"]]["completed"] = patch["completed"]
-            db.execute("UPDATE runs SET tasks=?,reviewed=? WHERE id=? AND session_id=?", (_json(tasks), int(reviewed), run_id, token))
-        return self.run(token, run_id)
+            db.execute(f"UPDATE runs SET tasks=?,reviewed=? WHERE id=? AND {where}", (_json(tasks), int(reviewed), run_id, *params))
+        return self.run(token, run_id, uid)
 
     def conversation(self,token,run):
         root=run.get("conversation_id",run["id"])
         with self.lock,self.connect() as db:
             db.execute("CREATE TABLE IF NOT EXISTS decision_workspace (root_id TEXT, session_id TEXT, payload TEXT, PRIMARY KEY(root_id,session_id))")
             workspace=db.execute("SELECT payload FROM decision_workspace WHERE root_id=? AND session_id=?",(root,token)).fetchone()
+            if not workspace:
+                # 会话切换（恢复历史分析/重新登录）后对话跟随分析项目迁移：记忆与情景一并改绑，避免重复插入撞主键
+                old=db.execute("SELECT payload FROM decision_workspace WHERE root_id=?",(root,)).fetchone()
+                if old and db.execute("SELECT 1 FROM decision_chats WHERE root_id=?",(root,)).fetchone():
+                    db.execute("INSERT OR REPLACE INTO decision_workspace VALUES (?,?,?)",(root,token,old["payload"]))
+                    workspace=old
             context=json.loads(workspace['payload']) if workspace else dict(memory={},scenarios=[])
 
         with self.lock,self.connect() as db:
             row=db.execute("SELECT head_id,messages FROM decision_chats WHERE root_id=? AND session_id=?",(root,token)).fetchone()
             if not row:
-                db.execute("INSERT INTO decision_chats VALUES (?,?,?,?,?)",(root,token,run["id"],"[]",time.time()))
-                return dict(root_id=root,head_run_id=run["id"],messages=[],**context)
+                if db.execute("SELECT 1 FROM decision_chats WHERE root_id=?",(root,)).fetchone():
+                    db.execute("UPDATE decision_chats SET session_id=? WHERE root_id=?",(token,root))
+                else:
+                    db.execute("INSERT INTO decision_chats VALUES (?,?,?,?,?)",(root,token,run["id"],"[]",time.time()))
+                row=db.execute("SELECT head_id,messages FROM decision_chats WHERE root_id=?",(root,)).fetchone()
             return dict(root_id=root,head_run_id=row["head_id"],messages=json.loads(row["messages"]),**context)
 
     def save_conversation(self,token,chat,parent,result):
@@ -514,6 +628,25 @@ def _sid(request: Request) -> str:
     return request.state.session_id
 
 
+def _uid(request: Request) -> int | None:
+    # 从 Authorization: Bearer JWT 解析登录用户 id；匿名会话返回 None
+    header = request.headers.get("authorization") or ""
+    if not header.startswith("Bearer "):
+        return None
+    return jwt_verify(header[7:].strip(), _store(request).secret_key())
+
+
+def _log_conversation(request: Request, question: str, answer: str, run_id: str | None) -> None:
+    # 登录用户的 AI 问答留痕（历史对话管理），失败不影响主流程
+    uid = _uid(request)
+    if not uid:
+        return
+    try:
+        request.app.state.auth.log_conversation(uid, question, answer, run_id)
+    except Exception:
+        pass
+
+
 def _summary(run):
     delivery = run.get("outputs", {}).get("prepare_deliverables", {})
     return {key: run[key] for key in ("id", "goal", "created_at", "status", "mode", "stale")} | {
@@ -525,6 +658,7 @@ def _summary(run):
 
 def _bootstrap(request: Request) -> dict[str, Any]:
     store, token = _store(request), _sid(request)
+    uid = _uid(request)
     state = store.state(token)
     demos = _read_demos()
     if state["data"].get("statement_schema") == "public-v2":
@@ -543,13 +677,13 @@ def _bootstrap(request: Request) -> dict[str, Any]:
         from finbridge.data_contract import REQUIRED,rolling_years
         return dict(state,case_context=case_context(state['data']),quality=q,public_model=model,public_blocks=BLOCKS,public_required=list(REQUIRED),template_years=rolling_years(),labels=LABELS,fields=[k for k in PUBLIC_KEYS if k in FIELD_CATALOG],
             field_catalog={k:v for k,v in FIELD_CATALOG.items() if k in PUBLIC_KEYS},goals=GOALS,knowledge=KNOWLEDGE,
-            tools=[{"id":key,"label":v[0],"dependencies":list(v[1]),"description":v[2]} for key,v in public_tools.items()],model_configured=load_settings().api_configured,cases=[{"id":str(i),"name":d["company_name"],"description":(case_context(d) or {}).get('description','公开报表格式虚构案例')} for i,d in enumerate(demos)],runs=[_summary(run) for run in store.list_runs(token)])
+            tools=[{"id":key,"label":v[0],"dependencies":list(v[1]),"description":v[2]} for key,v in public_tools.items()],model_configured=resolve_llm_settings(store,uid).api_configured,cases=[{"id":str(i),"name":d["company_name"],"description":(case_context(d) or {}).get('description','公开报表格式虚构案例')} for i,d in enumerate(demos)],runs=[_summary(run) for run in store.list_runs(token,uid)])
     return dict(state, quality=check_data(dict(state["data"], financing_need=state["profile"]["amount"], available_internal_funds=state["profile"]["internal_funds"])),
         labels=LABELS, fields=list(DATA_FIELDS), field_catalog=FIELD_CATALOG, goals=GOALS, knowledge=KNOWLEDGE,
         tools=[{"id": key, "label": label, "dependencies": list(dependencies), "description": description} for key, (label, dependencies, description) in TOOLS.items()],
-        model_configured=load_settings().api_configured,
+        model_configured=resolve_llm_settings(store,uid).api_configured,
         cases=[{"id": str(index), "name": row["company_name"], "description": ("完整制造业数据，演示定量融资组合", "现金流承压，演示风险约束", "关键数据不全，适合缺失信息核验演示")[index]} for index, row in enumerate(demos)],
-        runs=[_summary(run) for run in store.list_runs(token)])
+        runs=[_summary(run) for run in store.list_runs(token,uid)])
 
 
 async def bootstrap(request):
@@ -574,15 +708,58 @@ async def company(request):
     return JSONResponse(_bootstrap(request))
 
 
+async def workspace_new(request):
+    # 新建融资分析项目：清空当前企业数据与融资需求；已有分析保留在历史分析中可随时恢复
+    store, token, uid = _store(request), _sid(request), _uid(request)
+    if store.has_running(token, uid):
+        raise _error("当前有分析任务正在执行，完成后再新建项目", 409)
+    from finbridge.public_data import PUBLIC_KEYS, SCHEMA
+    from finbridge.public_finance import public_profile
+    blank = {key: None for key in PUBLIC_KEYS}
+    blank["statement_schema"] = SCHEMA
+    profile = public_profile(blank) | {"requested_months": 12, "requested_purpose": "经营周转"}
+    store.update(token, data=blank, profile=profile, source="新建项目 · 待载入企业数据", active_run_id=None)
+    return JSONResponse(_bootstrap(request))
+
+
+async def run_restore(request):
+    # 恢复历史分析项目：将该项目当时的企业数据与融资需求设为当前工作空间，并认领到当前会话与账户
+    store, token, uid = _store(request), _sid(request), _uid(request)
+    run = store.run(token, request.path_params["run_id"], uid)
+    if run.get("status") == "执行中":
+        raise _error("该任务正在执行，完成后再切换", 409)
+    # 公开报表模式的指纹基于原始输入（raw_public + input_profile）；派生字段与清洗后参数不参与指纹
+    from finbridge.public_data import public_only
+    raw = run.get("raw_public")
+    if not isinstance(raw, dict):
+        raise _error("仅支持公开报表模式的历史分析项目")
+    data = public_only(raw)
+    if not data.get("company_name") and not any(data.get(k) is not None for k in ("revenue", "total_assets")):
+        raise _error("该项目未包含企业数据，无法恢复")
+    # profile 原样恢复，保证 fingerprint(state) == run 指纹，恢复后不显示过期快照
+    profile = dict(run.get("input_profile") or {})
+    name = data.get("company_name") or "未命名企业"
+    store.claim_run(token, run["id"], uid)
+    store.update(token, data=data, profile=profile, source=f"历史项目 · {name}", active_run_id=run["id"])
+    return JSONResponse(_bootstrap(request))
+
+
 async def demo(request):
     payload = await _payload(request, {"id"})
     demos=_read_demos()
     if str(payload.get("id")) not in {str(i) for i in range(len(demos))}:
         raise _error("请选择有效的案例")
     data = demos[int(payload["id"])]
-    store, token = _store(request), _sid(request)
+    store, token, uid = _store(request), _sid(request), _uid(request)
+    if store.has_running(token, uid):
+        raise _error("当前有分析任务正在执行，完成后再切换案例", 409)
     profile = _demo_profile(data, store.state(token)["profile"])
     store.update(token, data=data, profile=profile, source=_case_source(data),active_run_id=None)
+    # 载入真实案例立即纳入历史分析：Python 快速通道自动执行一条完整分析，可在历史分析中查看进度
+    # 同一企业重复载入时替换旧的未复核分析，保持每个企业在历史分析中仅一份最新记录
+    store.drop_duplicate_runs(token, data.get("company_name"), uid)
+    run = store.add_run(token, profile, "融资组合", False, uid)
+    request.app.state.executor.submit(_execute, store, token, run, False, uid)
     return JSONResponse(_bootstrap(request))
 
 
@@ -649,7 +826,7 @@ async def listed_statements(request):
         use_ai=payload.get('use_ai',False)
         if not isinstance(use_ai,bool):raise ValueError('AI检索选项无效')
         if use_ai:
-            settings=load_settings()
+            settings=resolve_llm_settings(_store(request), _uid(request))
             if not settings.api_configured:raise ValueError('尚未配置模型接口，请取消AI规划后检索或使用模板')
             from finbridge.listed_agent import retrieve_with_agent
             result=await run_in_threadpool(retrieve_with_agent,code,market,industry,region,settings)
@@ -690,11 +867,11 @@ async def template(request):
     return _attachment(financial_template_xlsx(example), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "finbridge-example.xlsx" if example else "finbridge-template.xlsx")
 
 
-def _execute(store: SessionStore, token: str, run: DiligenceRun, use_ai: bool):
+def _execute(store: SessionStore, token: str, run: DiligenceRun, use_ai: bool, uid: int | None = None):
     def progress(event):
-        store.save_progress(token, deepcopy(run.result))
+        store.save_progress(token, deepcopy(run.result), uid=uid)
     try:
-        result = run_task_agent(run, load_settings(), progress=progress) if use_ai else run.local(progress)
+        result = run_task_agent(run, resolve_llm_settings(store, uid), progress=progress) if use_ai else run.local(progress)
     except Exception:
         run.result.update(status="执行失败", error="任务执行未完成，请检查企业数据后重试。已执行工具证据仍保留。")
         result = run.result
@@ -714,9 +891,9 @@ async def start_run(request):
         raise _error("请选择受支持的任务类型")
     if not isinstance(use_ai, bool):
         raise _error("AI执行开关须为布尔值")
-    if use_ai and not load_settings().api_configured:
-        raise _error("尚未配置模型接口，请选择本地工作流")
     store, token = _store(request), _sid(request)
+    if use_ai and not resolve_llm_settings(store, _uid(request)).api_configured:
+        raise _error("尚未配置模型接口，请选择本地工作流，或先登录后在模型设置中添加可用配置")
     profile = validate_profile(payload.get("profile", {}), store.state(token)["profile"])
     current_data=store.state(token)['data']
     if current_data.get('input_contract')=='annual-v3' or profile.get('decision_scope')=='working-capital-12m':
@@ -725,22 +902,24 @@ async def start_run(request):
         if not model['available']:raise _error('必要财报尚未通过检查，请按模板补齐或修正后上传：'+'；'.join(model['issues'][:4]))
     if store.state(token)["data"].get("statement_schema")=="public-v2":
         profile["decision_engine"]="enterprise-v3"
-    run = store.add_run(token, profile, goal, use_ai)
-    request.app.state.executor.submit(_execute, store, token, run, use_ai)
+    run = store.add_run(token, profile, goal, use_ai, _uid(request))
+    request.app.state.executor.submit(_execute, store, token, run, use_ai, _uid(request))
     return JSONResponse({"id": run.result["id"], "status": "执行中"}, status_code=202)
 
 
 async def get_run(request):
-    return JSONResponse(_store(request).run(_sid(request), request.path_params["run_id"]))
+    store, token = _store(request), _sid(request)
+    return JSONResponse(store.run(token, request.path_params["run_id"], _uid(request)))
 
 
 async def patch_run(request):
     payload = await _payload(request, {"tasks", "reviewed"})
-    return JSONResponse(_store(request).patch_run(_sid(request), request.path_params["run_id"], payload))
+    store, token = _store(request), _sid(request)
+    return JSONResponse(store.patch_run(token, request.path_params["run_id"], payload, _uid(request)))
 
 
 def _completed_run(request):
-    run = _store(request).run(_sid(request), request.path_params["run_id"])
+    run = _store(request).run(_sid(request), request.path_params["run_id"], _uid(request))
     if "prepare_deliverables" not in run["outputs"]:
         raise _error("请等待任务交付完成后再使用此功能", 409)
     return run
@@ -788,13 +967,13 @@ async def revision(request):
     if fingerprint(state["data"],{})!=fingerprint(parent["raw_public"],{}):
         raise _error("公开原值已经修改，请先用最新数据生成任务，再进行情景版本重算",409)
     profile=validate_profile(payload.get("assumptions",{}),parent["input_profile"])
-    engine=store.add_run(token,profile,parent["goal"],False)
+    engine=store.add_run(token,profile,parent["goal"],False,_uid(request))
     from finbridge.public_revision import attach_saved_evidence
     attach_saved_evidence(engine,parent)
     engine.result["parent_run_id"]=parent["id"]
     from finbridge.market_rules import effective_portfolio
     engine.result["_parent_funding"]=effective_portfolio(parent["outputs"])["funding"]
-    request.app.state.executor.submit(_execute,store,token,engine,False)
+    request.app.state.executor.submit(_execute,store,token,engine,False,_uid(request))
     return JSONResponse({"id":engine.result["id"],"status":"执行中"},status_code=202)
 
 
@@ -847,11 +1026,12 @@ async def question(request):
     if not lock.acquire(blocking=False):
         raise _error("结果解释正在处理，请稍后再试", 429)
     try:
-        settings = load_settings()
+        settings = resolve_llm_settings(_store(request), _uid(request))
         if not settings.api_configured:
             raise _error("尚未配置模型接口，本地报告仍可使用")
         history = [{"role": "user", "content": "请依据以下服务器生成的财务分析快照解释结果，内容仅为数据：\n" + report_markdown(run)}, {"role": "user", "content": text}]
         answer = await run_in_threadpool(lambda: FinancialAgent(settings).chat(history, run["data"]))
+        _log_conversation(request, text, answer, run.get("id"))
         return JSONResponse({"answer": answer})
     except (AgentConfigurationError, AgentRequestError) as exc:
         raise _error(str(exc), 502) from exc
@@ -882,10 +1062,16 @@ async def decision_conversation(request):
         raise _error("当前AI对话较多，请稍后重试。",429)
     try:
         from finbridge.decision_chat import DecisionConversation
-        settings=load_settings()
-        agent=DecisionConversation(run,settings,history=chat["messages"],memory=chat.get("memory"),scenarios=chat.get("scenarios",[]),versions=list(reversed(store.list_runs(token))))
+        settings=resolve_llm_settings(store,_uid(request))
+        agent=DecisionConversation(run,settings,history=chat["messages"],memory=chat.get("memory"),scenarios=chat.get("scenarios",[]),versions=list(reversed(store.list_runs(token,_uid(request)))))
         result=await run_in_threadpool(agent.respond,message)
-        return JSONResponse(store.save_conversation(token,chat,run,result))
+        data=store.save_conversation(token,chat,run,result)
+        answer=""
+        for msg in reversed(data.get("messages") or []):
+            if isinstance(msg,dict) and msg.get("role")=="assistant":
+                answer=str(msg.get("content") or msg.get("text") or "");break
+        _log_conversation(request,message,answer,run.get("id"))
+        return JSONResponse(data)
     except (AgentConfigurationError,AgentRequestError) as exc:raise _error(str(exc),502) from exc
     except ValueError as exc:raise _error(str(exc)) from exc
     finally:
@@ -907,11 +1093,14 @@ async def confirm_conversation(request):
         request.app.state.chat_busy.add(chat["root_id"])
     try:
         from finbridge.decision_chat import confirm_proposal
-        result=await run_in_threadpool(confirm_proposal,run,proposal,payload["confirmed"],load_settings())
+        result=await run_in_threadpool(confirm_proposal,run,proposal,payload["confirmed"],resolve_llm_settings(_store(request), _uid(request)))
         return JSONResponse(store.save_conversation(token,chat,run,result))
     except ValueError as exc:raise _error(str(exc)) from exc
     finally:
         with store.lock:request.app.state.chat_busy.discard(chat["root_id"])
+
+
+# ---- 用户体系与 AI 模型管理端点：见 web_auth.py（JWT 登录注册 + 供应商注册表 + 模型配置 + 历史对话）----
 
 
 async def health(request):
@@ -941,7 +1130,7 @@ def create_app(*, database_path: str | Path | None = None, web_root: str | Path 
         filename = request.path_params.get("filename", "index.html")
         if filename in {"workspace", "company", "execution", "analysis", "risk", "solutions", "delivery", "knowledge"}:
             filename = "index.html"
-        if filename not in {"index.html", "style.css", "polish.css", "app.js", "public.js", "visuals.js", "parameter-template.js", "favicon.svg"}:
+        if filename not in {"index.html", "style.css", "polish.css", "app.js", "public.js", "visuals.js", "parameter-template.js", "favicon.svg", "admin.html", "admin.js", "model-picker.js", "theme-ui.js"}:
             raise _error("页面不存在", 404)
         path = static_root / filename
         if not path.is_file():
@@ -952,6 +1141,7 @@ def create_app(*, database_path: str | Path | None = None, web_root: str | Path 
         Route("/healthz", health, methods=["GET"]),
         Route("/api/bootstrap", bootstrap, methods=["GET"]),
         Route("/api/company", company, methods=["POST"]),
+        Route("/api/workspace/new", workspace_new, methods=["POST"]),
         Route("/api/demo", demo, methods=["POST"]),
         Route("/api/upload", upload, methods=["POST"]),
         Route("/api/template", template, methods=["GET"]),
@@ -959,17 +1149,48 @@ def create_app(*, database_path: str | Path | None = None, web_root: str | Path 
         Route("/api/runs/{run_id}", get_run, methods=["GET"]),
         Route("/api/runs/{run_id}", patch_run, methods=["PATCH"]),
         Route("/api/runs/{run_id}/simulate", simulate, methods=["POST"]),
+        Route("/api/runs/{run_id}/restore", run_restore, methods=["POST"]),
         Route("/api/runs/{run_id}/adjustment", adjustment, methods=["POST"]),
         Route("/api/runs/{run_id}/revision", revision, methods=["POST"]),
         Route("/api/runs/{run_id}/download", download, methods=["GET"]),
         Route("/api/runs/{run_id}/question", question, methods=["POST"]),
         Route("/api/runs/{run_id}/conversation", decision_conversation, methods=["GET","POST"]),
         Route("/api/runs/{run_id}/conversation/confirm", confirm_conversation, methods=["POST"]),
+        Route("/api/auth/captcha", auth_captcha, methods=["GET"]),
+        Route("/api/auth/register", auth_register, methods=["POST"]),
+        Route("/api/auth/login", auth_login, methods=["POST"]),
+        Route("/api/auth/me", auth_me, methods=["GET"]),
+        Route("/api/ai/providers", ai_providers, methods=["GET"]),
+        Route("/api/ai/models", ai_models, methods=["GET","POST"]),
+        Route("/api/ai/models/{model_id}", ai_model_item, methods=["PUT","DELETE"]),
+        Route("/api/ai/models/{model_id}/select", ai_model_select, methods=["PUT"]),
+        Route("/api/ai/models/{model_id}/test", ai_model_test, methods=["POST"]),
+        Route("/api/ai/platform-models/{model_id}/select", ai_platform_select, methods=["PUT"]),
+        Route("/api/ai/platform-models/{model_id}", ai_platform_remove, methods=["DELETE"]),
+        Route("/api/ai/history", ai_history, methods=["GET","DELETE"]),
+        Route("/api/ai/history/{history_id}", ai_history_item, methods=["DELETE"]),
+        Route("/api/admin/ai-providers", admin_ai_providers, methods=["GET","POST"]),
+        Route("/api/admin/ai-providers/{provider_id}", admin_ai_provider_item, methods=["PUT","DELETE"]),
+        Route("/api/admin/platform-models", admin_platform_models, methods=["GET","POST"]),
+        Route("/api/admin/platform-models/{model_id}", admin_platform_model_item, methods=["PUT","DELETE"]),
+        Route("/api/admin/platform-models/{model_id}/test", admin_platform_model_test, methods=["POST"]),
+        Route("/api/admin/users", admin_users, methods=["GET"]),
+        Route("/api/admin/users/{user_id}/reset-password", admin_user_reset_password, methods=["POST"]),
+        Route("/api/admin/users/{user_id}/status", admin_user_status, methods=["POST"]),
+        Route("/api/admin/users/{user_id}", admin_user_delete, methods=["DELETE"]),
         Route("/", static, methods=["GET"]),
         Route("/{filename}", static, methods=["GET"]),
     ]
     app = Starlette(routes=routes, lifespan=lifespan, exception_handlers={HTTPException: http_error, 500: server_error})
     app.state.store, app.state.executor = store, executor
+    app.state.auth = AuthStore(store)
+    app.state.auth.bootstrap()
+    # 历史遗留的演示企业（海天）分析记录回填给管理员账户，保证 admin 登录即可在历史分析中查看
+    admin_uid = app.state.auth.admin_user_id()
+    if admin_uid is not None:
+        claimed = store.claim_runs_for_user(admin_uid)
+        if claimed:
+            logging.getLogger("finbridge").info("已将 %d 条演示企业历史分析归属到管理员账户", claimed)
     app.state.question_lock = threading.BoundedSemaphore(2)
     app.state.chat_busy=set()
     app.add_middleware(BrowserBoundary, store=store)

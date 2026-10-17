@@ -1,4 +1,4 @@
-"""DeepSeek plans a bounded retrieval tool; Python alone supplies annual figures."""
+"""AI model plans a bounded retrieval tool; Python alone supplies annual figures."""
 import json
 from openai import OpenAI
 from finbridge.data_contract import china_today,REQUIRED,LABELS
@@ -18,7 +18,7 @@ def retrieve_with_agent(code,market,industry,region,settings,model_client=None,r
         if len(calls)!=1 or calls[0].function.name!='fetch_public_annual_statements':raise ValueError('模型未选择允许的检索工具')
         args=json.loads(calls[0].function.arguments)
         if args!={'code':code,'market':market}:raise ValueError('模型工具参数与企业身份不一致')
-        used=True;trace.append('DeepSeek已选择公开年度财报检索工具；Python确定年份并取数。')
+        used=True;trace.append('AI模型已选择公开年度财报检索工具；Python确定年份并取数。')
     except Exception:
         trace.append('AI规划暂不可用，已降级执行同一受控检索工具；不影响数字核验规则。')
     result=retriever(code,market,industry,region)

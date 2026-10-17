@@ -17,8 +17,7 @@ tmp
 **/*.xlsx.top.png
 **/*.xlsx.bottom.png
 **/*.xlsx.inspect.ndjson
-.streamlit
-app_pages
+deploy
 output/**
 !output/真实企业案例/
 !output/真实企业案例/已验证演示/

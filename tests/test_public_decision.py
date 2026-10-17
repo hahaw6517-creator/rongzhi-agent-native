@@ -64,31 +64,6 @@ def test_higher_capex_or_stress_changes_budget_without_changing_raw_statements()
     assert b["outputs"]["optimize_financing_portfolio"]["funding"]["debt_total"]<=a["outputs"]["optimize_financing_portfolio"]["funding"]["debt_total"]
 
 
-@pytest.mark.parametrize("goal",["融资组合","风险分析","方案比较"])
-def test_public_pages_and_saved_revisions(goal):
-    from streamlit.testing.v1 import AppTest
-    app=AppTest.from_file("../app.py",default_timeout=25).run()
-    assert not app.exception
-    app.segmented_control[0].set_value(goal)
-    next(b for b in app.button if b.label=="生成公开报表决策").click().run()
-    assert not app.exception
-    run=deepcopy(app.session_state["runs"][0])
-    for page in ("execution","delivery","company","solutions"):
-        app.switch_page("app_pages/"+page+".py").run()
-        assert not app.exception
-    next(n for n in app.number_input if n.label=="历史资本开支倍数").set_value(1.5)
-    next(b for b in app.button if b.label=="重新求解并保存下一版").click().run()
-    assert not app.exception
-    latest=app.session_state["runs"][0]
-    assert latest["parent_run_id"]==run["id"]
-    assert latest["raw_public"]==run["raw_public"]
-    assert app.session_state["runs"][1]==run
-    # In requested-financing mode changing financial assumptions must not rewrite the user's requested amount.
-    assert latest["revision_delta"]["gap"]==0
-    assert latest["public_analysis"]["gap"]>run["public_analysis"]["gap"]
-    assert latest["revision_delta"]["debt_total"]<=0
-
-
 def test_public_ai_exposes_professional_tools_and_finishes_with_independent_verification():
     import json
     from types import SimpleNamespace

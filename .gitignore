@@ -1,8 +1,9 @@
+# 离线镜像包体积超 GitHub 100MB 单文件上限，部署时单独上传服务器
+deploy/images/
 .env
 .venv/
 __pycache__/
 .pytest_cache/
-.streamlit/secrets.toml
 .coverage
 tmp/
 data/runtime.sqlite3*

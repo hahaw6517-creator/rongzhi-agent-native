@@ -15,12 +15,5 @@ STRESS_HELP = "红色虚线是本项目设定的还款安全线1.20倍（不是�
 CASH_GAP_HELP = "“达到目标还需年度现金”是达到1.20倍安全线还需增加的年度还款现金，不是建议新增借款；即使当前够还本息，也可能尚未达到这条安全线。"
 
 
-def render_terms(keys=None):
-    import streamlit as st
-    with st.expander("术语说明 · 英文缩写是什么意思"):
-        for key in keys or TERMS:
-            st.markdown(f"**{key}**：{TERMS[key]}")
-
-
 def terminology_markdown():
     return ["## 术语速查", *[f"- **{key}**：{value}" for key, value in TERMS.items()]]

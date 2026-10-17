@@ -106,3 +106,37 @@ def test_enterprise_request_alternative_and_changed_demand_revision(public_clien
     assert revised['raw_public']==run['raw_public']
     assert revised['revision_delta']['gap']==-900_000.
     assert client.get('/api/runs/'+run['id']).json()['outputs']==run['outputs']
+
+
+def test_workspace_new_clears_state_and_restore_recovers_project(public_client):
+    client=public_client
+    # 先完成一个分析项目，作为历史分析条目
+    created=client.post('/api/runs',json={'goal':'融资组合','profile':{'requested_amount':1_500_000.}})
+    assert created.status_code==202,created.text
+    run_id=created.json()['id']
+    run=wait_for(client,run_id)
+    company_name=run['data']['company_name']
+    # 新建融资分析项目：清空当前企业数据与需求
+    fresh=client.post('/api/workspace/new')
+    assert fresh.status_code==200,fresh.text
+    b=fresh.json()
+    assert b['data']['company_name'] is None
+    assert b['data']['statement_schema']=='public-v2'
+    assert not b['public_model']['available']
+    assert b['source']=='新建项目 · 待载入企业数据'
+    assert b['active_run_id'] is None
+    # 恢复历史分析项目：企业数据、融资需求与当前项目指针一并还原，且不再是过期快照
+    restored=client.post(f'/api/runs/{run_id}/restore')
+    assert restored.status_code==200,restored.text
+    b=restored.json()
+    assert b['data']['company_name']==company_name
+    assert b['public_model']['available']
+    assert b['source'].startswith('历史项目 · ')
+    assert b['active_run_id']==run_id
+    assert not b['runs'][0]['stale']
+    # 执行中的项目不允许恢复
+    pending=client.post('/api/runs',json={'goal':'融资组合','profile':{'requested_amount':1_200_000.}})
+    assert pending.status_code==202
+    busy=client.post(f"/api/runs/{pending.json()['id']}/restore")
+    assert busy.status_code==409,busy.text
+    wait_for(client,pending.json()['id'])

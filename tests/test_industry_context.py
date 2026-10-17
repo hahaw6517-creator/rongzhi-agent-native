@@ -5,7 +5,6 @@ from types import SimpleNamespace
 import zipfile
 
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from finbridge.config import Settings
 from finbridge.industry_context import SECTIONS, _rss_sources, analyze_industry_region
@@ -178,17 +177,3 @@ def test_local_workflow_never_calls_context_model_and_all_goals_finish(engine):
         assert run["status"] == "已完成"
         assert run["outputs"]["analyze_industry_region"]["status"] == "未启用"
         assert len(run["events"]) == 9
-
-
-def test_model_context_renders_on_financial_solution_and_report_pages(engine):
-    app = AppTest.from_file("../app.py", default_timeout=20).run()
-    engine.industry_analyzer = lambda d, p, out: analyze_industry_region(
-        d, p, out, client=model_client(analysis_response()), model="test", search=lambda *_: [])
-    run = engine.local()
-    app.session_state["runs"] = [run]
-    app.session_state["active_run_id"] = run["id"]
-    app.session_state["task_checklists"] = {run["id"]: run["outputs"]["prepare_deliverables"]["tasks"]}
-    for page in ("execution", "solutions", "delivery"):
-        app.switch_page(f"app_pages/{page}.py").run()
-        assert not app.exception
-        assert any(subheader.value == "行业与地区融资分析" for subheader in app.subheader)

@@ -124,7 +124,7 @@ def test_workspace_persists_scenario_and_company_switch_clears_active_context(tm
         def __init__(self,*args,**kwargs):
             super().__init__(*args,**kwargs,client=ScriptedClient([[('simulate_scenario',dict(changes=dict(requested_amount=800000)))],dict(reply='临时试算已完成，原报告保留。',metric_keys=[],source_ids=[],follow_up=None)]))
     monkeypatch.setattr(chat_module,'DecisionConversation',FakeAgent)
-    monkeypatch.setattr(api,'load_settings',lambda:SETTINGS)
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:SETTINGS)
     with TestClient(api.create_app(database_path=tmp_path/'workspace.sqlite3')) as client:
         boot=client.get('/api/bootstrap').json()
         profile={**boot['profile'], 'requested_amount':600000,'requested_months':36,'requested_purpose':'设备购置','decision_engine':'enterprise-v3'}

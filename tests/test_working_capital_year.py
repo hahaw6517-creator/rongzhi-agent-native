@@ -173,7 +173,7 @@ def test_annual_chat_amount_confirmation_preserves_scope_and_facts(tmp_path,monk
         def __init__(self,*args,**kwargs):
             super().__init__(*args,**kwargs,client=ScriptedClient([[('recalculate_plan',{'changes':{'requested_amount':800000.}})],dict(reply='已准备金额调整，请确认后重新分析。',metric_keys=[],source_ids=[],follow_up=None)]))
     monkeypatch.setattr(chat,'DecisionConversation',Agent)
-    monkeypatch.setattr(api,'load_settings',lambda:Settings('test','https://example.invalid','test'))
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:Settings('test','https://example.invalid','test'))
     with TestClient(api.create_app(database_path=tmp_path/'chat-year.db')) as c:
         c.get('/api/bootstrap');start=c.post('/api/runs',json={'profile':{'requested_amount':600000.},'use_ai':False})
         assert start.status_code==202,start.text

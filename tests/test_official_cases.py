@@ -8,6 +8,7 @@ from finbridge.data_contract import completeness,REQUIRED
 from finbridge.deep_diagnostics import historical_issues
 from finbridge.public_data import parse_public_blocks
 from finbridge.web_api import create_app
+from conftest import settle
 
 def test_official_raw_data_and_xlsx_are_identical():
     manifest=json.loads(Path('data/official_cases/workbooks.json').read_text(encoding='utf8'))
@@ -29,16 +30,20 @@ def test_demo_registry_keeps_held_out_companies_out():
     assert {c['data']['security_code'] for c in cases}=={'603288','688111','600377'}
     assert all(find_real_case(c['data']) for c in cases)
 
-def test_workspace_route_case_downloads_and_no_automatic_runs(tmp_path):
+def test_workspace_route_case_downloads_and_auto_run(tmp_path):
+    # 载入真实案例立即生成一条历史分析（自动快速分析），同企业重复载入前需等待完成
     with TestClient(create_app(database_path=tmp_path/'demo.db')) as client:
         assert client.get('/workspace').status_code==200
         before=client.get('/api/bootstrap').json();assert before['runs']==[]
         for case in ('1','2'):
             b=client.post('/api/demo',json={'id':case}).json()
             assert b['profile']['requested_amount']==3e8 and b['case_context']['sources']
+            assert b['active_run_id']
+            settle(client,b['active_run_id'])  # 自动分析完成，历史分析中可见
             assert client.get('/api/template?case='+case).status_code==200
+        runs=client.get('/api/bootstrap').json()['runs']
+        assert len(runs)==2
         for case in ('fuyao','ctg'):
             r=client.get('/api/template?test_case='+case);assert r.status_code==200
             raw=parse_public_blocks(pd.read_excel(io.BytesIO(r.content),sheet_name=None,header=None)).iloc[0].to_dict()
             assert completeness(raw)['complete']
-        assert client.get('/api/bootstrap').json()['runs']==[]

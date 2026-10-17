@@ -35,27 +35,6 @@ def test_invalid_data_does_not_produce_an_approval_or_cashflow_claim():
     assert not b["scenarios"]
 
 
-@pytest.mark.parametrize("goal",["融资组合","风险分析","方案比较"])
-def test_report_and_workspace_have_distinct_controls_for_each_goal(goal):
-    from streamlit.testing.v1 import AppTest
-    run=case(goal)
-    app=AppTest.from_file("../app.py",default_timeout=20).run()
-    app.session_state["runs"]=[run]
-    app.session_state["active_run_id"]=run["id"]
-    app.session_state["task_checklists"]={run["id"]:run["outputs"]["prepare_deliverables"]["tasks"]}
-    app.switch_page("app_pages/delivery.py").run()
-    assert not app.exception
-    assert any(x.value=="这次分析在解决什么问题" for x in app.subheader)
-    assert any(x.value=="哪些数据支撑这个结论" for x in app.subheader)
-    assert not any(x.label=="1. 核对或修改企业数据" for x in app.button)
-    assert not any(x.label=="查看完整测算、压力测试与计算依据" for x in app.toggle)
-    app.switch_page("app_pages/solutions.py").run()
-    assert not app.exception
-    assert any(x.value=="调整前先核对什么" for x in app.subheader)
-    assert any(x.label=="1. 核对或修改企业数据" for x in app.button)
-    assert not any(x.value=="哪些数据支撑这个结论" for x in app.subheader)
-
-
 def test_export_escapes_untrusted_company_text():
     run=case("融资组合",company_name="<script>alert(1)</script>")
     assert "<script>alert(1)</script>" not in report_html(run)

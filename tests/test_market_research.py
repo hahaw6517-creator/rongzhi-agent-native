@@ -183,16 +183,6 @@ def test_specialist_extraction_rules_reoptimization_and_export_form_one_pipeline
     assert effective_portfolio(run["outputs"]) == ctx["market_decision"]["portfolio"]
     assert "本报告主建议采用近期证据触发的市场压力组合" in text
     assert "<th>市场情景组合（亿元）</th>" in report_html(run)
-    # The page must render the changed principal as the main recommendation, too.
-    from streamlit.testing.v1 import AppTest
-    app = AppTest.from_file("../app.py", default_timeout=20).run()
-    app.session_state["runs"] = [run]
-    app.session_state["active_run_id"] = run["id"]
-    app.session_state["task_checklists"] = {run["id"]: run["outputs"]["prepare_deliverables"]["tasks"]}
-    for page in ("execution", "solutions", "delivery"):
-        app.switch_page(f"app_pages/{page}.py").run()
-        assert not app.exception
-    assert any("近期证据触发" in element.value for element in app.info)
 
 
 def test_redirects_to_private_or_untrusted_hosts_are_not_followed(monkeypatch):

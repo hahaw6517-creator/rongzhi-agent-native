@@ -165,7 +165,7 @@ def test_api_correction_confirmation_updates_inputs_atomically_and_rejects_repla
     class Agent(original):
         def __init__(self,*a,**kw):super().__init__(*a,**kw,client=Client())
     monkeypatch.setattr(module,'DecisionConversation',Agent)
-    monkeypatch.setattr(api,'load_settings',lambda:SETTINGS)
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:SETTINGS)
     with TestClient(api.create_app(database_path=tmp_path/'correct.sqlite3')) as client:
         client.get('/api/bootstrap')
         assert client.post('/api/company',json={'data':enterprise_run['raw_public'],'profile':enterprise_run['input_profile']}).status_code==200

@@ -163,7 +163,7 @@ def test_native_conversation_persists_history_revisions_and_browser_isolation(tm
         def __init__(self,*args,**kwargs):
             super().__init__(*args,**kwargs,client=ScriptedClient([[('read_analysis',{}),('recalculate_plan',{'changes':{'requested_amount':600_000.,'requested_months':36}})],final_reply()]))
     monkeypatch.setattr(chat_module,'DecisionConversation',FakeAgent)
-    monkeypatch.setattr(api,'load_settings',lambda:SETTINGS)
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:SETTINGS)
     with TestClient(api.create_app(database_path=tmp_path/'chat.sqlite3')) as client:
         client.get('/api/bootstrap')
         created=client.post('/api/runs',json={'profile':base_run()['input_profile']})
@@ -190,6 +190,28 @@ def test_native_conversation_persists_history_revisions_and_browser_isolation(tm
         assert client.get('/api/runs/'+head+'/conversation').status_code==404
 
 
+def test_conversation_follows_run_into_new_session_without_crash(tmp_path,monkeypatch):
+    """会话切换（恢复历史分析/重新登录）后打开对话：对话跟随分析项目改绑新会话，不再撞 decision_chats 主键 500。"""
+    import sqlite3
+    import finbridge.working_capital_year as annual
+    import finbridge.web_api as api
+    monkeypatch.setattr(annual,'year_profile',lambda profile=None:dict(profile or {}))
+    monkeypatch.setattr('finbridge.model_resolver.load_settings',lambda:SETTINGS)
+    with TestClient(api.create_app(database_path=tmp_path/'rebind.sqlite3')) as client:
+        client.get('/api/bootstrap')
+        run=wait_run(client,client.post('/api/runs',json={'profile':base_run()['input_profile']}).json()['id'])
+        old='a'*64  # 伪造上一会话（未过期）：对话与工作区记忆都留在旧会话名下
+        with sqlite3.connect(tmp_path/'rebind.sqlite3') as db:
+            db.execute("INSERT INTO sessions(id,touched,state) VALUES (?,?,?)",(old,time.time()+3600,'{}'))
+            db.execute("INSERT INTO decision_chats(root_id,session_id,head_id,messages,updated) VALUES (?,?,?,?,?)",(run['id'],old,run['id'],'[]',1.0))
+            db.execute("INSERT INTO decision_workspace(root_id,session_id,payload) VALUES (?,?,?)",(run['id'],old,'{"memory":{"topic":"上限"},"scenarios":[1]}'))
+        chat=client.get('/api/runs/'+run['id']+'/conversation')
+        assert chat.status_code==200,chat.text
+        assert chat.json()['memory']=={'topic':'上限'},'记忆应随对话迁移到当前会话'
+        # 再次打开与追加消息不再触发重复插入冲突
+        assert client.get('/api/runs/'+run['id']+'/conversation').status_code==200
+
+
 def test_api_failure_does_not_save_draft_revision_or_messages(tmp_path,monkeypatch):
     import finbridge.working_capital_year as annual
     monkeypatch.setattr(annual,'year_profile',lambda profile=None:dict(profile or {}))
@@ -206,27 +228,3 @@ def test_api_failure_does_not_save_draft_revision_or_messages(tmp_path,monkeypat
         assert client.post(path,json={'message':'借60万元，三年还清'}).status_code==502
         assert client.get(path).json()['messages']==[]
         assert client.get('/api/bootstrap').json()['active_run_id']==run['id']
-
-
-@pytest.mark.parametrize('location',['solutions','delivery'])
-def test_streamlit_dialogue_recalculates_inline_and_retains_history(location,monkeypatch):
-    from streamlit.testing.v1 import AppTest
-    import finbridge.decision_chat_ui as chat_ui
-    class FakeAgent(DecisionConversation):
-        def __init__(self,*args,**kwargs):
-            super().__init__(*args,**kwargs,client=ScriptedClient([[('read_analysis',{}),('recalculate_plan',{'changes':{'requested_amount':600_000.,'requested_months':36}})],final_reply()]))
-    monkeypatch.setattr(chat_ui,'DecisionConversation',FakeAgent)
-    monkeypatch.setattr(chat_ui,'load_settings',lambda:SETTINGS)
-    app=AppTest.from_file('../app.py',default_timeout=25).run()
-    next(b for b in app.button if b.label=='生成公开报表决策').click().run()
-    original=deepcopy(app.session_state['runs'][0])
-    app.switch_page('app_pages/'+location+'.py').run()
-    assert not app.exception and len(app.chat_input)==1
-    app.chat_input[0].set_value('改成借60万元、36个月还完，帮我重算').run()
-    assert not app.exception
-    latest=app.session_state['runs'][0]
-    assert latest['id']!=original['id'] and latest['parent_run_id']==original['id']
-    assert latest['raw_public']==original['raw_public']
-    assert latest['input_profile']['requested_amount']==600_000.
-    assert len(app.session_state['decision_conversations'][original['id']]['messages'])==2
-    assert app.session_state['runs'][1]==original

@@ -1,4 +1,4 @@
-"""DeepSeek chat agent with bounded, validated financial function calling."""
+"""AI chat agent with bounded, validated financial function calling."""
 
 from __future__ import annotations
 
@@ -101,7 +101,7 @@ def execute_financial_tool(arguments: Mapping[str, object]) -> dict[str, object]
 
 
 class FinancialAgent:
-    """Chat with DeepSeek and execute model-requested Python financial tools."""
+    """Chat with the configured AI model and execute model-requested Python financial tools."""
 
     def __init__(
         self,
@@ -112,7 +112,7 @@ class FinancialAgent:
     ) -> None:
         self.settings = settings or load_settings()
         if not self.settings.api_configured:
-            raise AgentConfigurationError("尚未配置 DeepSeek API，请在 .env 中填写 API Key、BASE_URL 和 MODEL。")
+            raise AgentConfigurationError("尚未配置 AI 模型接口，请在模型设置中添加可用模型，或通过环境变量配置。")
         if not 1 <= max_tool_calls <= MAX_TOOL_CALLS:
             raise ValueError(f"单轮工具调用次数必须在 1 到 {MAX_TOOL_CALLS} 之间")
         self.max_tool_calls = max_tool_calls
@@ -147,7 +147,7 @@ class FinancialAgent:
                     tool_choice="auto",
                 )
             except Exception as error:
-                raise AgentRequestError("DeepSeek 请求失败，请检查网络、API 配置及服务状态。") from error
+                raise AgentRequestError("AI 模型请求失败，请检查网络、API 配置及服务状态。") from error
 
             assistant_message = response.choices[0].message
             tool_calls = assistant_message.tool_calls or []

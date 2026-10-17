@@ -39,6 +39,9 @@ const paths = {
   send:'m22 2-8 20-4-8-8-4zM22 2 10 14',
   leaf:'M20 3C8 2 2 9 5 16s17 6 15-13M5 19l10-10',
   lock:'M6 10V7a6 6 0 0 1 12 0v3M4 10h16v12H4zM12 14v4',
+  chat:'M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5zM8 11h.01M12 11h.01M16 11h.01',
+  user:'M20 21a8 8 0 1 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
+  trash:'M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7',
 };
 const icon = (name, cls='') => `<svg class="icon ${cls}" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[name]||paths.document}"/></svg>`;
 const e = v => String(v??'').replace(/(?:预计)?(?:可用于还款的?现金|还款现金)/g,'预计可用于偿债的现金').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -51,15 +54,20 @@ const notice = (text,tone='') => `<div class="notice ${tone}">${icon(tone==='red
 const btn = (text,action,ico='arrow',type='') => `<button class="btn ${type}" data-action="${action}">${icon(ico)}${e(text)}</button>`;
 const tabs = (items,current) => `<div class="page-tabs" role="tablist">${items.map(([id,label])=>`<button type="button" role="tab" aria-selected="${id===current}" class="${id===current?'active':''}" data-tab="${id}">${e(label)}</button>`).join('')}</div>`;
 const nav = [ ['workspace','分析工作台','dashboard','/workspace'],['company','企业与数据','building','/company'],['execution','财务分析','chart','/analysis'],['solutions','融资决策','layers','/solutions'],['risk','风险评估','shield','/risk'],['delivery','分析报告','folder','/delivery'],['knowledge','模型方法','book','/knowledge'] ];
-const state = {boot:null,run:null,page:'workspace',tab:{company:'import',execution:'timeline',delivery:'report',knowledge:'sources'},goal:'融资组合',busy:false,upload:null,filter:'全部',messages:[],mobile:false,query:'',fieldGroup:null,companyDraft:null,runId:sessionStorage.getItem('finbridge_run')||null};
+const AUTH_KEY='finbridge_token',AUTH_USER_KEY='finbridge_user';
+function loadAuth(){try{return {token:localStorage.getItem(AUTH_KEY)||null,user:JSON.parse(localStorage.getItem(AUTH_USER_KEY)||'null')};}catch{return {token:null,user:null};}}
+function saveAuth(data){state.auth={token:data.token,user:data.user};localStorage.setItem(AUTH_KEY,data.token);localStorage.setItem(AUTH_USER_KEY,JSON.stringify(data.user));}
+function clearAuth(){state.auth={token:null,user:null};state.userMenuOpen=false;localStorage.removeItem(AUTH_KEY);localStorage.removeItem(AUTH_USER_KEY);}
+const state = {boot:null,run:null,page:'workspace',tab:{company:'import',execution:'timeline',delivery:'report',knowledge:'sources'},goal:'融资组合',busy:false,upload:null,filter:'全部',messages:[],mobile:false,query:'',fieldGroup:null,companyDraft:null,runId:sessionStorage.getItem('finbridge_run')||null,auth:loadAuth(),authOpen:false,authTab:'login',authCaptcha:{id:'',img:''},authDraft:{username:'',password:'',nickname:''},userMenuOpen:false,histOpen:false,histList:[],histAuth:false,modelOpen:false,models:{list:[],selectedId:null,platform:[]},modelProviders:[],modelMode:null,modelEditing:null,modelForm:null,chatModelOpen:false,chatModelsLoaded:false,sidebarCollapsed:localStorage.getItem('finbridge_sb')==='1'};
 let pollTimer, toastTimer;
 async function api(url,options={}){
   const headers = {...options.headers};
+  if(state.auth?.token)headers['Authorization']='Bearer '+state.auth.token;
   if(options.body && !(options.body instanceof FormData)){headers['Content-Type']='application/json';options.body=JSON.stringify(options.body);}
   const response=await fetch(url,{...options,headers,credentials:'same-origin'});
   const contentType=response.headers.get('content-type')||'';
   const data=contentType.includes('json')?await response.json():null;
-  if(!response.ok)throw new Error(data?.detail||data?.error||data?.message||'请求未完成，请稍后重试。');
+  if(!response.ok){if(response.status===401&&state.auth?.token)clearAuth();throw new Error(data?.detail||data?.error||data?.message||'请求未完成，请稍后重试。');}
   return data;
 }
 function toast(text){const t=document.querySelector('#toast');t.textContent=text;t.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('visible'),3800);}
@@ -69,11 +77,21 @@ function heading(kicker,title,description,actions=''){return `<div class="page-h
 function cardTitle(title,ico,extra=''){return `<div class="card-title"><h2>${icon(ico)}${e(title)}</h2>${extra}</div>`;}
 function metrics(items){return `<div class="metrics">${items.map(([label,value,unit,note,ico])=>`<div class="metric"><div class="metric-label">${e(label)}${icon(ico)}</div><div class="metric-value">${e(value)}${unit?`<span class="unit">${e(unit)}</span>`:''}</div><div class="metric-note">${e(note)}</div></div>`).join('')}</div>`;}
 function field(label,name,value,type='text',extra=''){return `<label class="field"><span>${e(label)}</span><input type="${type}" name="${name}" value="${e(value)}" ${extra}></label>`;}
-function selectField(label,name,options,value){return `<label class="field"><span>${e(label)}</span><select name="${name}">${options.map(o=>`<option value="${e(o)}" ${o===value?'selected':''}>${e(o)}</option>`).join('')}</select></label>`;}
+function selectField(label,name,options,value){return `<label class="field"><span>${e(label)}</span>${uiSelect(name,options,value)}</label>`;}
 function snapshotBanner(){let s=notice(`${state.run.id} · ${state.run.data.company_name} · ${state.run.created_at.slice(0,16).replace('T',' ')} · ${state.run.mode}`);if(state.run.stale)s+=notice('企业数据或融资需求已更新。当前为历史任务快照，请重新执行后使用。','amber');if(state.run.model_warning)s+=notice(state.run.model_warning,'amber');return s;}
 function noRun(){return `<div class="empty-state">${icon('document')}<h2>从一个融资目标开始</h2><p>先确认企业数据与融资需求，启动任务后即可在这里查看结果。</p>${btn('创建融资分析任务','new-task','plus','primary')}</div>`;}
 function isComplete(){return !!state.run?.outputs?.prepare_deliverables;}
 function download(format,label,ico='download',primary=false){return `<a class="btn ${primary?'primary':''}" data-report-download="${format}" href="/api/runs/${encodeURIComponent(state.run.id)}/download?format=${format}" download>${icon(ico)}${e(label)}</a>`;}
+const protocolText=p=>p==='anthropic'?'Anthropic 格式':'OpenAI 兼容格式';
+const truncate=(v,n)=>{const s=String(v||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;};
+function timeAgo(iso){const t=new Date(iso).getTime();if(!t)return '';const s=Math.floor((Date.now()-t)/1000);if(s<60)return '刚刚';if(s<3600)return `${Math.floor(s/60)} 分钟前`;if(s<86400)return `${Math.floor(s/3600)} 小时前`;return `${Math.floor(s/86400)} 天前`;}
+async function loadCaptcha(){try{const data=await api('/api/auth/captcha');state.authCaptcha={id:data.captchaId,img:data.imageBase64};}catch{state.authCaptcha={id:'',img:''};}const img=document.querySelector('#captcha-img');if(img&&state.authCaptcha.img)img.src=state.authCaptcha.img;}
+// 顶栏用户区：未登录展示「登录 / 注册」；已登录展示昵称 + 菜单（模型设置 / 历史分析 / 管理后台 / 退出）
+function userArea(){
+  const u=state.auth.user;
+  if(!u)return `<button type="button" class="btn small" data-action="auth-open">${icon('lock')}登录 / 注册</button>`;
+  return `<div class="user-chip ${state.userMenuOpen?'open':''}"><button type="button" class="user-chip-btn" data-action="user-menu" aria-expanded="${state.userMenuOpen}">${icon('lock')}<span class="user-chip-name">${e(u.nickname||u.username)}</span>${u.role===1?badge('管理员','blue'):''}</button><div class="user-menu" role="menu"><button type="button" role="menuitem" data-action="model-settings">${icon('lock')}模型设置</button><button type="button" role="menuitem" data-action="hist-open">${icon('clock')}历史分析</button>${u.role===1?`<a role="menuitem" href="/admin.html" target="_blank" rel="noopener">${icon('shield')}管理后台</a>`:''}<button type="button" role="menuitem" data-action="logout">${icon('close')}退出登录</button></div></div>`;
+}
 
 function bindReportDownloads(){
  document.querySelectorAll('[data-report-download]').forEach(link=>link.addEventListener('click',async event=>{
@@ -95,10 +113,85 @@ function bindReportDownloads(){
 function shell(content){
   const b=state.boot,p=nav.find(x=>x[0]===state.page);
   const data=b.data;
-  return `<div class="mobile-scrim ${state.mobile?'visible':''}" data-action="close-menu"></div><aside class="sidebar ${state.mobile?'open':''}" id="workspace-navigation" aria-label="主导航"><a class="brand" href="/" data-page="workspace"><span class="brand-mark"><svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M8 23V7h17M8 15h13M16 23v-8"/></svg></span><span><span class="brand-name">融智 Agent</span><span class="brand-sub">FINBRIDGE AI</span></span></a><div class="nav-label">财务决策工作空间</div><nav>${nav.filter(x=>x[0]!=="knowledge").map(([id,label,ico,url])=>`<a class="nav-link ${state.page===id?'active':''}" href="${url}" data-page="${id}" ${state.page===id?'aria-current="page"':''}>${icon(ico)}${label}</a>`).join('')}</nav><div class="sidebar-bottom"><div class="sidebar-company"><small>当前分析企业</small><strong>${e(data.company_name)}</strong>${badge(data.report_period||'待确认报告期')}${badge(b.source.startsWith('真实算例')?'真实财报算例':b.source.startsWith('模拟')?'模拟案例':'用户数据',b.source.startsWith('模拟')?'amber':'blue')}</div><div class="sidebar-foot"><div class="avatar">融</div><div>企业财务决策工作空间<br><small>有依据 · 可执行 · 可追溯</small></div></div></div></aside><div class="shell"><header class="topbar"><div class="breadcrumbs"><button class="icon-btn menu-btn" data-action="menu" aria-label="展开导航" aria-expanded="${state.mobile}" aria-controls="workspace-navigation">${icon('menu')}</button><span>财务决策工作空间</span>${icon('chevron')}<b>${p[1]}</b></div><div class="topbar-actions"><span class="connection"><span class="status-dot"></span>${b.model_configured?'智能规划已就绪':'本地分析已就绪'}</span><button class="btn small" data-action="new-task">${icon('plus')}新建融资分析</button><span class="avatar">融</span></div></header><main class="main" id="main">${content}<footer class="section-footer"><span>© 融智 Agent · 企业财务分析与融资决策</span><div class="footer-items"><span>${icon('shield')}数据隔离</span><span>${icon('check')}证据可追溯</span><span>${icon('leaf')}审慎分析</span></div></footer></main></div>`;
+  return `<div class="mobile-scrim ${state.mobile?'visible':''}" data-action="close-menu"></div><aside class="sidebar ${state.mobile?'open':''}" id="workspace-navigation" aria-label="主导航"><a class="brand" href="/" data-page="workspace"><span class="brand-mark"><svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M8 23V7h17M8 15h13M16 23v-8"/></svg></span><span><span class="brand-name">融智 FinBridge</span><span class="brand-sub">FINBRIDGE AI</span></span></a><nav>${nav.filter(x=>x[0]!=="knowledge").map(([id,label,ico,url])=>`<a class="nav-link ${state.page===id?'active':''}" href="${url}" data-page="${id}" title="${e(label)}" ${state.page===id?'aria-current="page"':''}>${icon(ico)}${label}</a>`).join('')}</nav><div class="sidebar-bottom"><div class="sidebar-company"><small>当前分析企业</small><strong>${e(data.company_name||'待载入企业')}</strong>${badge(data.report_period||'待确认报告期')}</div></div></aside><div class="shell"><header class="topbar"><div class="breadcrumbs"><button class="icon-btn menu-btn" data-action="menu" aria-label="展开导航" aria-expanded="${state.mobile}" aria-controls="workspace-navigation">${icon('menu')}</button><span>财务决策工作空间</span>${icon('chevron')}<b>${p[1]}</b></div><div class="topbar-actions"><button type="button" class="btn small" data-action="model-settings" title="管理使用的模型接口">${icon('lock')}<span class="topbar-btn-text">${b.model_configured?'模型已就绪':'模型设置'}</span></button><button type="button" class="btn small" data-action="hist-open" title="历史分析">${icon('clock')}<span class="topbar-btn-text">历史分析</span></button><button class="btn small" data-action="new-task">${icon('plus')}<span class="topbar-btn-text">新建融资分析</span></button>${userArea()}</div></header><main class="main" id="main">${content}<footer class="section-footer"><span>© 融智 FinBridge · 企业财务分析与融资决策</span><div class="footer-items"><span>${icon('shield')}数据隔离</span><span>${icon('check')}证据可追溯</span><span>${icon('leaf')}审慎分析</span></div></footer></main></div>`;
 }
 
 function flowArt(){return `<svg class="hero-art" aria-hidden="true" viewBox="0 0 390 180"><path class="flow-line" d="M40 96H90M165 96h55M293 96h40M129 72V38h126v34M129 120v29h126v-29"/><circle cx="40" cy="96" r="6" fill="#a6bea0"/><circle cx="337" cy="96" r="6" fill="#a6bea0"/><rect x="90" y="70" width="76" height="53" rx="10" class="flow-node"/><rect x="219" y="70" width="76" height="53" rx="10" class="flow-node"/><rect x="167" y="21" width="54" height="34" rx="8" fill="#d9e5d0" stroke="#bdcfb2"/><text x="128" y="102" text-anchor="middle" class="flow-label">任务目标</text><text x="257" y="102" text-anchor="middle" class="flow-label">成果交付</text><text x="194" y="43" text-anchor="middle" fill="#6e875e" font-size="10">Agent</text><rect x="168" y="133" width="53" height="32" rx="7" fill="#d9e5d0" stroke="#bdcfb2"/><path d="m184 149 6 5 13-12" fill="none" stroke="#879f74" stroke-width="1.8"/><circle cx="193" cy="96" r="13" fill="#bdd0ad" fill-opacity=".3"/><circle cx="193" cy="96" r="5" fill="#8eaa79"/></svg>`;}
+
+// 模型设置弹窗：复刻 template（大福食刻）AI 助手配置方法
+// 状态条 → 平台托管模型分组 → 我的模型列表 → ＋添加模型（供应商宫格 → 表单，含官方文档链接）
+function modelItem(m,kind){
+  return `<div class="model-item ${m.isSelected?'sel':''}">
+    <div class="model-item-main"><strong>${e(m.name||m.displayName||m.modelId)}</strong>${m.isSelected?badge('使用中','green'):''}<small>${e(m.modelId)} · ${protocolText(m.protocol)}</small>${kind==='platform'?`<small>平台托管 · 免配置密钥</small>`:`<small>${e(m.baseUrl)}</small><small>${e(m.apiKeyMasked||'未设置密钥')}</small>`}</div>
+    <div class="model-item-ops">${m.isSelected?'':`<button type="button" class="btn ghost small" data-action="${kind==='platform'?'platform-use':'model-use'}" data-model="${m.id}">使用</button>`}${kind==='self'?`<button type="button" class="btn ghost small" data-action="model-test" data-model="${m.id}">测试</button><button type="button" class="btn ghost small" data-action="model-edit" data-model="${m.id}">编辑</button><button type="button" class="btn ghost small" data-action="model-delete" data-model="${m.id}">删除</button>`:''}</div>
+  </div>`;
+}
+// 表单复用共享组件 model-picker.js（与后台平台托管模型同一套字段与交互）
+function modelForm(mode){
+  const form=state.modelForm,provider=state.modelProviders.find(p=>p.providerKey===form?.provider);
+  return mpFormHtml(form,provider,{mode,prefix:'model'});
+}
+function modelDialog(){
+  const data=state.models||{list:[],selectedId:null,platform:[]};
+  const selected=data.list.find(m=>m.id===data.selectedId);
+  const platformSel=(data.platform||[]).find(p=>p.isSelected);
+  let body='';
+  if(state.modelMode==='pick'){
+    body=`<div class="cfg-group"><div class="cfg-group-head"><h3>选择供应商</h3><small>官方注册表，也可选「自定义」手动填写。</small></div>
+    ${mpProvGrid(state.modelProviders,'model')}
+    <div class="form-actions"><button type="button" class="btn" data-action="model-cancel">取消</button></div></div>`;
+  }else if(state.modelMode==='form'){
+    body=`<div class="cfg-group"><div class="cfg-group-head"><h3>${state.modelEditing?'编辑模型':'添加模型'}</h3><small>密钥加密存储、仅显示掩码。</small></div>${modelForm(state.modelEditing?'edit':'add')}</div>`;
+  }else{
+    body=`<div class="cfg-state ${selected||platformSel?'on':''}">${icon(selected||platformSel?'check':'info')}<span>${selected?`使用中 · ${e(selected.displayName||selected.modelId)}`:platformSel?`使用中 · 平台托管 · ${e(platformSel.name)}`:'未选择模型 · 使用环境变量配置'}</span></div>
+    <div class="cfg-group"><div class="cfg-group-head"><h3>平台托管模型</h3><small>由管理员在后台配置密钥，选用即生效。</small></div>${data.platform.length?data.platform.map(p=>modelItem(p,'platform')).join(''):`<p class="subtle-caption">平台暂未提供托管模型，可在管理后台配置。</p>`}</div>
+    <div class="cfg-group"><div class="cfg-group-head"><h3>我的模型</h3><small>最多添加 6 个；首个自动「使用中」，删除使用中项自动回落。</small></div>${data.list.length?data.list.map(m=>modelItem(m,'self')).join(''):`<p class="subtle-caption">还没有自配模型。点击下方「＋ 添加模型」，选择供应商后填写接口信息。</p>`}</div>
+    <div class="form-actions"><button type="button" class="btn primary" data-action="model-add">${icon('plus')}添加模型</button></div>`;
+  }
+  return `<div class="dialog-backdrop" data-action="model-close"><div class="dialog dialog-wide" role="dialog" aria-modal="true" aria-label="模型设置">
+  <div class="dialog-head"><h2>${icon('lock')}模型设置</h2><button class="icon-btn" data-action="model-close" aria-label="关闭设置">${icon('close')}</button></div>
+  <p class="subtle-caption">登录用户可添加自己的模型接口（OpenAI 兼容 / Anthropic），多套配置随时切换「使用中」；AI 理解、调度与解释环节使用当前配置，密钥加密存储、仅显示掩码。未配置时依次使用平台托管与环境变量模型，Python 计算与验证不受影响。</p>
+  ${body}
+  </div></div>`;
+}
+
+// 登录 / 注册弹窗：图形验证码点击刷新，提交失败自动换图并清空验证码输入
+function authDialog(){
+  const isLogin=state.authTab==='login';
+  return `<div class="dialog-backdrop" data-action="auth-close"><div class="dialog auth-dialog" role="dialog" aria-modal="true" aria-label="${isLogin?'登录':'注册'}">
+  <div class="dialog-head"><h2>${icon('lock')}${isLogin?'登录融智 FinBridge':'注册融智账号'}</h2><button class="icon-btn" data-action="auth-close" aria-label="关闭">${icon('close')}</button></div>
+  <p class="subtle-caption">${isLogin?'登录后可配置自己的模型接口，分析问答将同步到历史分析。':'注册后即可使用模型设置与历史分析管理。'}</p>
+  <div class="auth-tabs" role="tablist"><button type="button" role="tab" aria-selected="${isLogin}" class="${isLogin?'active':''}" data-action="auth-tab" data-tab="login">登录</button><button type="button" role="tab" aria-selected="${!isLogin}" class="${!isLogin?'active':''}" data-action="auth-tab" data-tab="register">注册</button></div>
+  <form id="auth-form">
+    ${field('用户名','auth_username',state.authDraft.username,'text','required minlength="3" maxlength="32" pattern="[A-Za-z0-9_]{3,32}" title="3-32 位字母、数字或下划线" autocomplete="username"')}
+    ${isLogin?'':field('昵称（选填）','auth_nickname',state.authDraft.nickname,'text','maxlength="32"')}
+    ${field('密码','auth_password',state.authDraft.password,'password','required minlength="6" maxlength="64" autocomplete="current-password"')}
+    ${isLogin?'':field('确认密码','auth_password2',state.authDraft.password2||'','password','required minlength="6" maxlength="64" autocomplete="new-password" placeholder="再次输入相同密码"')}
+    <div class="captcha-row"><label class="field"><span>图形验证码</span><input type="text" name="captchaCode" required maxlength="6" autocomplete="off" placeholder="不区分大小写"></label><img id="captcha-img" class="captcha-img" src="${state.authCaptcha.img}" alt="图形验证码，看不清可点击刷新" title="点击刷新" data-action="captcha-refresh"></div>
+    <div class="form-actions"><button type="submit" class="btn primary">${icon('check')}${isLogin?'登录':'注册'}</button></div>
+    <div id="auth-error" class="form-error" role="alert"></div>
+  </form></div></div>`;
+}
+
+// 历史分析抽屉：上方为当前分析企业与历史分析项目（可点击切换查看），下方为登录用户的问答留痕；「新融资分析」即新建项目
+function historyDrawer(){
+  const runs=state.boot.runs||[];
+  const runItem=x=>`<div class="hist-run ${x.id===state.runId?'current':''}" data-action="hist-run" data-hist-run="${e(x.id)}"><div class="hist-run-head"><strong>${e(x.goal)}</strong>${x.id===state.runId?badge('当前分析','green'):badge(x.status,x.status==='已完成'?'green':'amber')}</div><div class="hist-run-sub">${e(x.company_name)}${x.report_period?` · ${e(x.report_period)}`:''}</div><div class="hist-run-meta"><span>${timeAgo(x.created_at)}</span>${x.stale?'<span>数据已更新 · 历史快照</span>':''}</div></div>`;
+  const qaList=state.histAuth
+    ?(state.histList.length?state.histList.map(h=>`<div class="hist-item" data-action="hist-view"><div class="hist-q">${icon('chat')}${e(h.question)}</div><div class="hist-a">${e(truncate(h.answer,140))}</div><div class="hist-meta"><span>${timeAgo(h.createdAt)}</span><button type="button" class="icon-btn small" data-action="hist-del" data-hist="${h.id}" aria-label="删除该条记录">${icon('close')}</button></div></div>`).join(''):`<div class="empty-small">${icon('clock')}<div><p>还没有问答记录</p><small>在任务结果页追问，问答会留存在这里，最多保留 20 条。</small></div></div>`)
+    :`<div class="empty-small">${icon('lock')}<div><p>登录后可查看问答留痕</p><small>分析项目跟随当前会话；问答留痕与登录账号绑定，最多保留 20 条。</small></div></div>`;
+  return `<div class="drawer-backdrop" data-action="hist-close"><aside class="drawer" role="dialog" aria-modal="true" aria-label="历史分析">
+  <div class="drawer-head"><h2>${icon('clock')}历史分析</h2><button class="icon-btn" data-action="hist-close" aria-label="关闭">${icon('close')}</button></div>
+  <div class="hist-ops"><button type="button" class="btn small" data-action="hist-new-task">${icon('plus')}新融资分析</button><button type="button" class="btn ghost small" data-action="hist-clear">${icon('warning')}清空问答</button></div>
+  <div class="hist-list">
+    <div class="hist-current"><small>当前分析企业</small><strong>${e(state.boot.data.company_name||'待载入企业')}</strong><span>${e(state.boot.data.report_period||'待确认报告期')}</span></div>
+    <div class="hist-group-head"><span>分析项目</span><small>${runs.length?runs.length+' 项':'暂无'}</small></div>
+    ${runs.length?runs.map(runItem).join(''):`<div class="empty-small">${icon('document')}<div><p>还没有分析项目</p><small>点击「新融资分析」创建第一个融资分析任务。</small></div></div>`}
+    <div class="hist-group-head"><span>分析问答</span><small>${state.histAuth?`${state.histList.length} 条`:'需登录'}</small></div>
+    ${qaList}
+  </div>
+  </aside></div>`;
+}
 
 function workspace(){
   const b=state.boot,p=b.profile,q=b.quality,r=state.run,delivery=r?.outputs?.prepare_deliverables;
@@ -106,7 +199,7 @@ function workspace(){
   return heading('FINANCING WORKSPACE','让财务数据，形成可计算的融资组合。','把资金缺口、渠道容量、成本和压力偿付约束，放到同一个预算中。')+
   `<section class="hero"><div><div class="hero-kicker">${icon('bolt')}FINBRIDGE INTELLIGENCE</div><h1>每一笔资金，都有计算依据。</h1><p>上传财务输入，让 Agent 求解组合、核验压力，<br>量化资金缺口，并给出经营改善建议。</p><button class="btn ghost" data-action="method">了解 Agent 的工作方式 ${icon('arrow')}</button></div>${flowArt()}</section>`+
   metrics([['本次外部资金缺口',amountNumber(Math.max(0,p.amount-p.internal_funds)/1e8),'亿元','需求总额 − 可用自有资金','chart'],['财务数据覆盖率',q.coverage,'%','衡量资料完整性，不是信用评分','layers'],['已执行融资分析任务',b.runs.length,'项','当前工作空间真实任务记录','document'],['待完成准备事项',r?remaining:'—','项',r?'来自当前任务的行动清单':'执行任务后自动生成','clock']])+
-  `<div class="grid-main"><section class="card" id="task-card">${cardTitle('创建融资分析任务','document',`<span class="model-pill">目标驱动 · 工具执行</span>`)}<form id="task-form"><div class="segment" role="group" aria-label="选择任务目标">${Object.keys(b.goals).map(g=>`<button type="button" data-goal="${g}" class="${g===state.goal?'active':''}">${g}</button>`).join('')}</div><label class="field"><span>任务说明</span><textarea name="objective" rows="3" maxlength="2000" placeholder="描述你希望解决的融资问题…">${e(p.objective)}</textarea></label><div class="fields-row"><label class="field"><span>资金需求总额</span><div class="input-suffix" data-unit="亿元"><input name="amount" type="number" min="0" max="100000000000" step="0.01" value="${e(p.amount/1e8)}" required></div></label><label class="field"><span>可用自有资金</span><div class="input-suffix" data-unit="亿元"><input name="internal_funds" type="number" min="0" max="100000000000" step="0.01" value="${e(p.internal_funds/1e8)}" required></div></label></div><div class="fields-row">${selectField('融资期限（月）','months',[...new Set([6,12,18,24,36,60,p.months])].sort((a,b)=>a-b).map(String),String(p.months))}${selectField('资金用途','purpose',['经营周转','订单备货','设备购置','综合融资'],p.purpose)}</div><div class="request-summary"><span>本次预计外部融资缺口</span><strong id="gap-preview">${money(Math.max(0,p.amount-p.internal_funds))}</strong></div><div class="switch-row"><div><div class="switch-label">${icon('bolt')}AI 自主规划</div><p class="switch-copy">开启后，模型根据目标选择工具，观察结果并完成任务。</p></div><label class="switch"><input name="use_ai" type="checkbox" aria-label="启用 AI 自主规划" ${b.model_configured?'':'disabled'}><span class="switch-track"></span></label></div><p class="consent-note">启用后将企业数据发送至原配置模型，并执行行业地区近期检索、正文核验与市场情景重算；公开检索仅发送行业与地区。关闭时不调用模型或联网检索。</p><div class="form-actions"><button type="submit" class="btn primary" ${state.busy?'disabled':''}>${state.busy?'<span class="spinner"></span>':icon('play')}${state.busy?'正在启动…':'启动融资分析任务'}</button><button type="button" class="btn" data-action="save-task">保存需求</button></div><div id="task-error" class="form-error" role="alert"></div></form></section><div class="side-stack"><section class="card">${cardTitle('当前企业档案','building',btn('管理','company','arrow','ghost small'))}<div class="company-heading"><span class="company-symbol">${icon('building')}</span><div><h3>${e(b.data.company_name)}</h3><p>${e(p.industry||'行业待确认')} · ${e(p.region||'地区待确认')}</p></div></div><div class="company-meta"><span>报告期间</span><strong>${e(b.data.report_period||'待确认')}</strong></div><div class="company-meta"><span>数据来源</span><strong>${e(b.source)}</strong></div><div class="company-meta"><span>核验状态</span>${badge(q.blocked?'需修正数据':q.core_missing.length?'资料待补充':'基础字段齐备',q.blocked?'red':q.core_missing.length?'amber':'green')}</div><div class="coverage-line"><span style="width:${q.coverage}%"></span></div><p class="coverage-caption">资料覆盖 ${q.coverage}% · 真实性仍需人工核验</p><a href="/company" data-page="company" class="btn wide small">${icon('upload')}导入或补充企业资料</a></section><section class="card">${cardTitle('一次任务，完整交付','folder')}<div class="tools-mini">${[['shield','风险诊断'],['branch','组合求解'],['chart','压力测试'],['document','融资分析报告']].map(([ico,label])=>`<div class="tool-mini"><div class="mini-icon">${icon(ico)}</div>${label}</div>`).join('')}</div><p class="subtle-caption">关键判断关联输入与公式，任务结果随数据变化；每份交付保留执行依据。</p></section></div></div>`+
+  `<div class="grid-main"><section class="card" id="task-card">${cardTitle('创建融资分析任务','document',`<span class="model-pill">目标驱动 · 工具执行</span>`)}<form id="task-form"><div class="segment" role="group" aria-label="选择任务目标">${Object.keys(b.goals).map(g=>`<button type="button" data-goal="${g}" class="${g===state.goal?'active':''}">${g}</button>`).join('')}</div><label class="field"><span>任务说明</span><textarea name="objective" rows="3" maxlength="2000" placeholder="描述你希望解决的融资问题…">${e(p.objective)}</textarea></label><div class="fields-row"><label class="field"><span>资金需求总额</span><div class="input-suffix" data-unit="亿元"><input name="amount" type="number" min="0" max="100000000000" step="0.01" value="${e(p.amount/1e8)}" required></div></label><label class="field"><span>可用自有资金</span><div class="input-suffix" data-unit="亿元"><input name="internal_funds" type="number" min="0" max="100000000000" step="0.01" value="${e(p.internal_funds/1e8)}" required></div></label></div><div class="fields-row">${selectField('融资期限（月）','months',[...new Set([6,12,18,24,36,60,p.months])].sort((a,b)=>a-b).map(String),String(p.months))}${selectField('资金用途','purpose',['经营周转','订单备货','设备购置','综合融资'],p.purpose)}</div><div class="request-summary"><span>本次预计外部融资缺口</span><strong id="gap-preview">${money(Math.max(0,p.amount-p.internal_funds))}</strong></div><div class="switch-row"><div><div class="switch-label">${icon('bolt')}AI 自主规划</div><p class="switch-copy">开启后，模型根据目标选择工具，观察结果并完成任务。</p></div><label class="switch"><input name="use_ai" type="checkbox" aria-label="启用 AI 自主规划" ${b.model_configured?'':'disabled'}><span class="switch-track"></span></label></div><p class="consent-note">启用后将企业数据发送至原配置模型，并执行行业地区近期检索、正文核验与市场情景重算；公开检索仅发送行业与地区。关闭时不调用模型或联网检索。</p><div class="form-actions"><button type="submit" class="btn primary" ${state.busy?'disabled':''}>${state.busy?'<span class="spinner"></span>':icon('play')}${state.busy?'正在启动…':'启动融资分析任务'}</button><button type="button" class="btn" data-action="save-task">保存需求</button></div><div id="task-error" class="form-error" role="alert"></div></form></section><div class="side-stack"><section class="card">${cardTitle('当前企业档案','building',btn('管理','company','arrow','ghost small'))}<div class="company-heading"><span class="company-symbol">${icon('building')}</span><div><h3>${e(b.data.company_name||'待载入企业')}</h3><p>${e(p.industry||'行业待确认')} · ${e(p.region||'地区待确认')}</p></div></div><div class="company-meta"><span>报告期间</span><strong>${e(b.data.report_period||'待确认')}</strong></div><div class="company-meta"><span>数据来源</span><strong>${e(b.source)}</strong></div><div class="company-meta"><span>核验状态</span>${badge(q.blocked?'需修正数据':q.core_missing.length?'资料待补充':'基础字段齐备',q.blocked?'red':q.core_missing.length?'amber':'green')}</div><div class="coverage-line"><span style="width:${q.coverage}%"></span></div><p class="coverage-caption">资料覆盖 ${q.coverage}% · 真实性仍需人工核验</p><a href="/company" data-page="company" class="btn wide small">${icon('upload')}导入或补充企业资料</a></section><section class="card">${cardTitle('一次任务，完整交付','folder')}<div class="tools-mini">${[['shield','风险诊断'],['branch','组合求解'],['chart','压力测试'],['document','融资分析报告']].map(([ico,label])=>`<div class="tool-mini"><div class="mini-icon">${icon(ico)}</div>${label}</div>`).join('')}</div><p class="subtle-caption">关键判断关联输入与公式，任务结果随数据变化；每份交付保留执行依据。</p></section></div></div>`+
   `<section class="card" style="margin-top:25px">${cardTitle('最近融资分析任务','clock',r?btn('查看当前交付','delivery','arrow','ghost small'):'<small>执行后自动记录</small>')}${b.runs.length?`<div class="data-scroll"><table class="recent-table"><thead><tr><th>任务与企业</th><th>执行模式</th><th>创建时间</th><th>状态</th><th></th></tr></thead><tbody>${b.runs.map(x=>`<tr><td><span class="task-name">${e(x.goal)} · ${e(x.id)}</span><small>${e(x.company_name||x.data?.company_name||'')}</small></td><td>${e(x.mode)}</td><td>${e((x.created_at||'').slice(0,16).replace('T',' '))}</td><td>${badge(x.status,x.status==='已完成'?'green':'amber')}</td><td><button class="btn ghost small" data-run="${e(x.id)}">查看${icon('arrow')}</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="empty-small">${icon('clock')}<div><p>还没有执行任务</p><small>从上方提交第一个融资目标，开始建立企业的融资分析记录。</small></div></div>`}</section>`;
 }
 
@@ -143,7 +236,7 @@ function importedProfile(row){
 function company(){
   const b=state.boot,q=b.quality,tab=state.tab.company;
   let content='';
-  if(tab==='import')content=`<div class="grid-main"><section class="card">${cardTitle('导入企业财务数据','upload')}<label class="upload-area" id="drop-zone">${icon('upload')}<strong>点击选择，或将财务表格拖入这里</strong><p>支持 CSV、XLSX、XLSM · 单文件不超过10MB</p><input type="file" id="upload-input" accept=".csv,.xlsx,.xlsm" aria-label="上传财务表格"></label><p class="subtle-caption">中文XLSX模板按分组填写，并附字段、单位和来源说明。比例填5.2表示5.2%；每行一家企业，可合并同企业同期间工作表。暂不支持扫描PDF。</p><div class="inline-actions" style="margin-top:18px"><a class="btn small" href="/api/template" download>${icon('download')}中文XLSX模板</a><a class="btn small" href="/api/template?format=csv" download>${icon('download')}CSV模板</a><a class="btn small" href="/api/template?example=1" download>${icon('document')}带数值的模拟示例</a></div>${state.upload?`<div class="file-preview">${notice(`已读取${state.upload.filename}，识别出${state.upload.records.length}条企业记录。`)}<label class="field"><span>选择企业与期间</span><select id="upload-row">${state.upload.records.map((row,i)=>`<option value="${i}">${e(row.company_name)} · ${e(row.report_period||'待确认期间')}</option>`).join('')}</select></label><button class="btn primary" data-action="use-upload">${icon('check')}使用这份企业数据</button><p class="subtle-caption">同时载入该记录的资金需求、自有资金、行业、地区及融资用途。未填写需求金额时设为0待确认，避免沿用其他企业需求。</p></div>`:''}</section><section class="card">${cardTitle('体验模拟案例','layers')}<p class="subtle-caption" style="margin:0 0 15px">虚构场景，用于观察财务变化如何影响资金组合。</p>${b.cases.map((c,i)=>`<div class="case-option"><div class="company-symbol">${icon(['building','warning','document'][i]||'building')}</div><div><strong>${e(c.name)}</strong><p>${e(c.description)}</p></div><button class="btn small" data-demo="${e(c.id)}">载入</button></div>`).join('')}</section></div>`;
+  if(tab==='import')content=`<div class="grid-main"><section class="card">${cardTitle('导入企业财务数据','upload')}<label class="upload-area" id="drop-zone">${icon('upload')}<strong>点击选择，或将财务表格拖入这里</strong><p>支持 CSV、XLSX、XLSM · 单文件不超过10MB</p><input type="file" id="upload-input" accept=".csv,.xlsx,.xlsm" aria-label="上传财务表格"></label><p class="subtle-caption">中文XLSX模板按分组填写，并附字段、单位和来源说明。比例填5.2表示5.2%；每行一家企业，可合并同企业同期间工作表。暂不支持扫描PDF。</p><div class="inline-actions" style="margin-top:18px"><a class="btn small" href="/api/template" download>${icon('download')}中文XLSX模板</a><a class="btn small" href="/api/template?format=csv" download>${icon('download')}CSV模板</a><a class="btn small" href="/api/template?example=1" download>${icon('document')}带数值的模拟示例</a></div>${state.upload?`<div class="file-preview">${notice(`已读取${state.upload.filename}，识别出${state.upload.records.length}条企业记录。`)}<label class="field"><span>选择企业与期间</span>${uiSelect('upload-row',state.upload.records.map((row,i)=>({value:String(i),label:row.company_name+' · '+(row.report_period||'待确认期间')})),'0')}</label><button class="btn primary" data-action="use-upload">${icon('check')}使用这份企业数据</button><p class="subtle-caption">同时载入该记录的资金需求、自有资金、行业、地区及融资用途。未填写需求金额时设为0待确认，避免沿用其他企业需求。</p></div>`:''}</section><section class="card">${cardTitle('体验模拟案例','layers')}<p class="subtle-caption" style="margin:0 0 15px">虚构场景，用于观察财务变化如何影响资金组合。</p>${b.cases.map((c,i)=>`<div class="case-option"><div class="company-symbol">${icon(['building','warning','document'][i]||'building')}</div><div><strong>${e(c.name)}</strong><p>${e(c.description)}</p></div><button class="btn small" data-demo="${e(c.id)}">载入</button></div>`).join('')}</section></div>`;
   else{
     const draft=companyDraft(),catalog=companyCatalog(),entries=Object.entries(catalog).filter(([,meta])=>['元','%','月','年'].includes(meta.unit));
     const groups=[...new Set(entries.map(([,meta])=>meta.group||'其他字段'))];
@@ -358,7 +451,7 @@ function delivery(){
     const done=r.tasks.filter(x=>x.completed).length;
     const items=r.tasks.filter(x=>state.filter==='全部'||(state.filter==='未完成'?!x.completed:x.priority===state.filter));
     content+=`<section class="card"><div class="action-progress"><h2>融资分析进度</h2><span>${done} / ${r.tasks.length} 已完成</span></div><div class="coverage-line" style="height:6px"><span style="width:${r.tasks.length?done/r.tasks.length*100:0}%"></span></div><div class="action-filter" role="group" aria-label="筛选行动任务">${['全部','优先','常规','未完成'].map(x=>`<button data-filter="${x}" class="${state.filter===x?'active':''}">${x}</button>`).join('')}</div>${items.map(x=>`<label class="action-item ${x.completed?'done':''}"><input type="checkbox" data-task="${e(x.id)}" ${x.completed?'checked':''}><span><strong>${e(x.title)}</strong><small>${e(x.id)} · ${e(x.owner)}<br>依据：${e(x.evidence)}</small></span>${badge(x.priority,x.priority==='优先'?'amber':'')}</label>`).join('')||'<p class="subtle-caption">当前筛选下没有任务。</p>'}<div style="margin-top:20px">${download('csv','导出当前行动进度')}</div></section>`;
-  } else content+=`<section class="card">${cardTitle('围绕本次结果继续追问','mail')}<p class="subtle-caption">解释已有证据和测算假设。追问不会修改报告或代替你提交银行申请。</p><div class="inline-actions" style="margin:20px 0">${['为什么这样分配各渠道金额？','回款提速能释放多少资金？','现金流下行时应怎样调整组合？'].map(x=>`<button class="btn small" data-question="${e(x)}">${e(x)}</button>`).join('')}</div><div id="chat-messages">${state.messages.map(x=>`<div class="chat-message ${x.role}">${e(x.content)}</div>`).join('')}</div><form id="question-form"><label class="review-row"><input type="checkbox" name="consent" required ${state.boot.model_configured?'':'disabled'}><span>允许将本任务数据与报告发送到已配置的模型服务，用于结果解释。</span></label><div class="chat-compose"><textarea name="question" rows="3" maxlength="2000" placeholder="例如：为什么这样分配融资金额，回款提速后组合会怎样变化？" required ${state.boot.model_configured?'':'disabled'}></textarea><button class="btn primary" type="submit" ${state.boot.model_configured?'':'disabled'}>${icon('send')}发送</button></div></form>${!state.boot.model_configured?notice('当前模型未配置，仍可使用完整的本地分析与报告功能。','amber'):''}</section>`;
+  } else content+=`<section class="card">${cardTitle('围绕本次结果继续追问','mail')}<p class="subtle-caption">解释已有证据和测算假设。追问不会修改报告或代替你提交银行申请。</p><div class="inline-actions" style="margin:20px 0">${['为什么这样分配各渠道金额？','回款提速能释放多少资金？','现金流下行时应怎样调整组合？'].map(x=>`<button class="btn small" data-question="${e(x)}">${e(x)}</button>`).join('')}</div><div id="chat-messages">${state.messages.map(x=>`<div class="chat-message ${x.role}">${e(x.content)}</div>`).join('')}</div><form id="question-form"><div class="chat-model-line"><span class="subtle-caption" style="margin:0">本轮对话使用的模型</span><span class="chat-model-slot"><button type="button" class="btn ghost small" data-action="chat-model" aria-haspopup="menu" aria-expanded="${!!state.chatModelOpen}" title="选择本轮对话使用的模型">${icon('bolt')}${chatModelLabel()}${icon('chevron')}</button>${state.chatModelOpen?chatModelPopover():''}</span></div><label class="review-row"><input type="checkbox" name="consent" required ${state.boot.model_configured?'':'disabled'}><span>允许将本任务数据与报告发送到已配置的模型服务，用于结果解释。</span></label><div class="chat-compose"><textarea name="question" rows="3" maxlength="2000" placeholder="例如：为什么这样分配融资金额，回款提速后组合会怎样变化？" required ${state.boot.model_configured?'':'disabled'}></textarea><button class="btn primary" type="submit" ${state.boot.model_configured?'':'disabled'}>${icon('send')}发送</button></div></form>${!state.boot.model_configured?notice('当前模型未配置，仍可使用完整的本地分析与报告功能。','amber'):''}</section>`;
   return content;
 }
 
@@ -383,11 +476,12 @@ function render(){
  const focusId=focused?.id,selection=focused&&typeof focused.selectionStart==='number'?[focused.selectionStart,focused.selectionEnd]:null;
  const views={workspace,company,execution,solutions,delivery,knowledge,risk:publicRisk};
  if(state.boot.data.statement_schema==='public-v2')Object.assign(views,{workspace:publicWorkspace,company:publicCompany,execution:publicExecution,solutions:publicSolutions,risk:publicRisk,delivery:publicDelivery,knowledge:publicKnowledge});
- root.innerHTML=shell(views[state.page]());root.dataset.viewPage=state.page;root.dataset.viewRun=runKey;root.dataset.viewCompany=company;
- document.title=`${nav.find(x=>x[0]===state.page)[1]} · 融智 Agent`;
+ root.innerHTML=shell(views[state.page]())+(state.modelOpen?modelDialog():'')+(state.authOpen?authDialog():'')+(state.histOpen?historyDrawer():'');root.dataset.viewPage=state.page;root.dataset.viewRun=runKey;root.dataset.viewCompany=company;
+ document.title=`${nav.find(x=>x[0]===state.page)[1]} · 融智 FinBridge`;
  const queues=new Map();for(const d of details){if(!queues.has(d.label))queues.set(d.label,[]);queues.get(d.label).push(d.open);}
  for(const d of root.querySelectorAll('main details')){const matches=queues.get(d.querySelector(':scope>summary')?.textContent.trim());if(matches?.length)d.open=matches.shift();}
  document.body.classList.toggle('nav-open',state.mobile);
+ document.body.classList.toggle('sb-collapsed',state.sidebarCollapsed);
  bind();window.scrollTo({top:savedY,behavior:'instant'});
  const newLog=document.querySelector('#sme-chat-log');if(newLog&&savedLog!=null)newLog.scrollTop=savedLog;
  if(focusId){const next=document.getElementById(focusId);next?.focus({preventScroll:true});if(next&&selection)try{next.setSelectionRange(...selection);}catch{}}
@@ -402,8 +496,14 @@ function syncTaskDraft(profile){
 async function refreshBoot(){state.boot=await api('/api/bootstrap');if(!Object.hasOwn(state.boot.goals,state.goal))state.goal=Object.keys(state.boot.goals)[0]||'融资组合';}
 async function loadRun(id,poll=false){
   const run=await api(`/api/runs/${encodeURIComponent(id)}`);if(state.runId!==id)state.messages=[];state.run=run;state.runId=id;sessionStorage.setItem('finbridge_run',id);
+  refreshChatModels();
   if(poll&&run.status==='执行中')schedulePoll();else clearTimeout(pollTimer);
   return run;
+}
+async function refreshChatModels(){
+  // 决策对话区的模型按钮文案需要已选模型名；载入分析后静默预取一次，失败时按钮回退"默认模型"
+  if(state.chatModelsLoaded)return;state.chatModelsLoaded=true;
+  try{state.models=await api('/api/ai/models');render();}catch{}
 }
 function schedulePoll(){clearTimeout(pollTimer);pollTimer=setTimeout(async()=>{try{await loadRun(state.runId,true);if(isComplete()){await refreshBoot();toast('融资分析任务已完成，报告与行动清单已生成。');}if(state.page==='execution'||state.page==='workspace')render();}catch(err){toast(err.message);}},1200);}
 async function saveTask(start=false){
@@ -426,18 +526,83 @@ function bind(){
   document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',async()=>{
     const action=el.dataset.action;
     if(nav.some(x=>x[0]===action)){navigate(action);return;}
-    if(action==='new-task'){navigate('workspace');document.querySelector('#task-card').scrollIntoView({behavior:'smooth',block:'start'});return;}
+    if(action==='new-task'||action==='hist-new-task'){
+      // 新建融资分析项目：清空当前企业数据与需求；已有分析保留在历史分析中可恢复
+      if(!(await uiConfirm({title:'新建融资分析项目？',message:'当前未保存的企业数据与融资需求将被清除；已有分析仍保留在「历史分析」中，可随时恢复继续。',confirmText:'新建项目'})))return;
+      try{
+        state.boot=await api('/api/workspace/new',{method:'POST'});
+        state.companyDraft=null;state.run=null;state.runId=null;state.messages=[];
+        state.decisionChat=null;state.decisionChatFor=null;state.decisionChatDraft='';state.decisionChatError='';
+        sessionStorage.removeItem('finbridge_run');
+        state.histOpen=false;render();navigate('workspace');
+        document.querySelector('#task-card')?.scrollIntoView({behavior:'smooth',block:'start'});
+        toast('已新建融资分析项目，请先载入企业数据。');
+      }catch(err){toast(err.message);}
+      return;}
     if(action==='method'){state.tab.knowledge='methods';navigate('knowledge');return;}
-    if(action==='menu'||action==='close-menu'){state.mobile=action==='menu'?!state.mobile:false;document.querySelector('.sidebar').classList.toggle('open',state.mobile);document.querySelector('.mobile-scrim').classList.toggle('visible',state.mobile);document.body.classList.toggle('nav-open',state.mobile);document.querySelector('.menu-btn')?.setAttribute('aria-expanded',String(state.mobile));return;}
+    if(action==='menu'||action==='close-menu'){
+      // 对标主流 AI 工作台：桌面端左上角按钮收起/展开侧边栏（窄条图标态），移动端仍是抽屉导航
+      if(window.matchMedia('(max-width:760px)').matches){state.mobile=action==='menu'?!state.mobile:false;document.querySelector('.sidebar').classList.toggle('open',state.mobile);document.querySelector('.mobile-scrim').classList.toggle('visible',state.mobile);document.body.classList.toggle('nav-open',state.mobile);document.querySelector('.menu-btn')?.setAttribute('aria-expanded',String(state.mobile));}
+      else{state.sidebarCollapsed=!state.sidebarCollapsed;localStorage.setItem('finbridge_sb',state.sidebarCollapsed?'1':'0');render();}
+      return;}
     if(action==='save-task'){await saveTask();return;}
+    if(action==='model-settings'){
+      if(!state.auth.token){state.authTab='login';state.authOpen=true;await loadCaptcha();render();toast('请先登录后再配置模型。');return;}
+      try{[state.models,state.modelProviders]=await Promise.all([api('/api/ai/models'),api('/api/ai/providers').then(d=>d.list||[])]);}catch{state.models={list:[],selectedId:null,platform:[]};state.modelProviders=[];}
+      state.modelOpen=true;state.modelMode=null;state.modelEditing=null;state.modelForm=null;render();return;}
+    if(action==='model-close'){state.modelOpen=false;state.modelMode=null;state.modelEditing=null;state.modelForm=null;render();return;}
+    if(action==='chat-model'){
+      // 决策对话区的模型快捷选择：懒加载模型列表后开关气泡，选中即用 platform-use / model-use 既有切换逻辑
+      if(!state.chatModelsLoaded){state.chatModelsLoaded=true;try{state.models=await api('/api/ai/models');}catch{state.models={list:[],selectedId:null,platform:[]};}}
+      state.chatModelOpen=!state.chatModelOpen;render();return;}
+    if(action==='chat-model-manage'){
+      if(!state.auth.token){state.chatModelOpen=false;state.authTab='login';state.authOpen=true;await loadCaptcha();render();toast('请先登录后再配置模型。');return;}
+      state.chatModelOpen=false;
+      try{[state.models,state.modelProviders]=await Promise.all([api('/api/ai/models'),api('/api/ai/providers').then(d=>d.list||[])]);state.chatModelsLoaded=true;}catch{state.models={list:[],selectedId:null,platform:[]};state.modelProviders=[];}
+      state.modelOpen=true;state.modelMode=null;state.modelEditing=null;state.modelForm=null;render();return;}
+    if(action==='platform-use'){try{await api(`/api/ai/platform-models/${el.dataset.model}/select`,{method:'PUT'});state.models=await api('/api/ai/models');await refreshBoot();render();toast('已切换为平台托管模型。');}catch(err){toast(err.message);}return;}
+    if(action==='model-use'){try{await api(`/api/ai/models/${el.dataset.model}/select`,{method:'PUT'});state.models=await api('/api/ai/models');await refreshBoot();render();toast('已切换为该模型配置。');}catch(err){toast(err.message);}return;}
+    if(action==='model-add'){state.modelMode='pick';state.modelEditing=null;state.modelForm=null;render();return;}
+    if(action==='model-pick'){const p=state.modelProviders.find(x=>x.providerKey===el.dataset.provider);if(!p)return;state.modelMode='form';state.modelEditing=null;state.modelForm={provider:p.providerKey,protocol:p.protocol,baseUrl:p.baseUrl,modelId:'',displayName:'',apiKey:''};render();return;}
+    if(action==='model-repick'){state.modelMode='pick';render();return;}
+    if(action==='model-cancel'){state.modelMode=null;state.modelEditing=null;state.modelForm=null;render();return;}
+    if(action==='model-edit'){const item=(state.models.list||[]).find(m=>m.id===Number(el.dataset.model));if(!item)return;state.modelMode='form';state.modelEditing=item.id;state.modelForm={provider:item.provider,protocol:item.protocol,baseUrl:item.baseUrl,modelId:item.modelId,displayName:item.displayName,apiKey:''};render();return;}
+    if(action==='model-delete'){if(!(await uiConfirm({title:'删除该模型配置？',message:'删除「使用中」项后会自动回落到其他配置。',confirmText:'删除',danger:true})))return;try{const result=await api(`/api/ai/models/${el.dataset.model}`,{method:'DELETE'});state.models=result.models||await api('/api/ai/models');if(state.modelEditing===Number(el.dataset.model)){state.modelEditing=null;state.modelMode=null;}await refreshBoot();render();toast('已删除该模型配置。');}catch(err){toast(err.message);}return;}
+    if(action==='model-test'){el.disabled=true;const label=el.textContent;el.textContent='测试中…';try{await api(`/api/ai/models/${el.dataset.model}/test`,{method:'POST'});toast('连通性测试通过，该模型可正常调用。');}catch(err){toast(err.message);}finally{el.disabled=false;el.textContent=label;}return;}
+    if(action==='auth-open'){state.authTab='login';state.authOpen=true;await loadCaptcha();render();return;}
+    if(action==='auth-close'){state.authOpen=false;render();return;}
+    if(action==='auth-tab'){const f=document.querySelector('#auth-form');if(f)state.authDraft={username:f.auth_username?.value||'',password:f.auth_password?.value||'',password2:f.auth_password2?.value||'',nickname:f.auth_nickname?.value||''};state.authTab=el.dataset.tab;await loadCaptcha();render();return;}
+    if(action==='captcha-refresh'){await loadCaptcha();return;}
+    if(action==='user-menu'){state.userMenuOpen=!state.userMenuOpen;render();return;}
+    if(action==='logout'){clearAuth();try{await refreshBoot();}catch{}render();toast('已退出登录。');return;}
+    if(action==='hist-open'){
+      // 分析项目对所有会话可用；问答留痕需登录，拉取失败（未登录/过期）时仅在抽屉内提示
+      state.histList=[];state.histAuth=!!state.auth.token;
+      if(state.histAuth){try{state.histList=(await api('/api/ai/history')).list||[];}catch{state.histAuth=false;}}
+      state.histOpen=true;render();return;}
+    if(action==='hist-close'){state.histOpen=false;render();return;}
+    if(action==='hist-view'){el.classList.toggle('expanded');return;}
+    if(action==='hist-del'){if(!(await uiConfirm({title:'删除这条问答记录？',confirmText:'删除',danger:true})))return;try{await api(`/api/ai/history/${el.dataset.hist}`,{method:'DELETE'});state.histList=(await api('/api/ai/history')).list||[];render();}catch(err){toast(err.message);}return;}
+    if(action==='hist-clear'){if(!(await uiConfirm({title:'清空全部分析问答？',message:'此操作不可恢复，将删除最近 20 条问答留痕。',confirmText:'全部清空',danger:true})))return;try{await api('/api/ai/history',{method:'DELETE'});state.histList=[];render();toast('已清空问答记录。');}catch(err){toast(err.message);}return;}
+    if(action==='hist-run'){try{
+      // 恢复历史分析项目：后端将该项目当时的企业数据与融资需求设为当前工作空间
+      state.histOpen=false;
+      state.boot=await api(`/api/runs/${encodeURIComponent(el.dataset.histRun)}/restore`,{method:'POST'});
+      state.companyDraft=null;
+      await loadRun(el.dataset.histRun,true);
+      navigate(isComplete()?'delivery':'execution');
+    }catch(err){toast(err.message);}return;}
     if(action==='use-upload'){
-      const row=state.upload.records[Number(document.querySelector('#upload-row').value)];
+      const row=state.upload.records[Number(document.querySelector('input[name=upload-row]')?.value||0)];
       try{const profile=importedProfile(row);state.boot=await api('/api/company',{method:'POST',body:{data:row,source:'用户上传 · '+state.upload.filename,profile}});state.companyDraft=null;state.upload=null;if(!state.boot.active_run_id){state.run=null;state.runId=null;state.decisionChat=null;state.decisionChatFor=null;state.decisionChatDraft='';sessionStorage.removeItem('finbridge_run');}if(state.runId)await loadRun(state.runId);state.tab.company='profile';render();toast('企业数据及融资需求已同步，请核对金额与用途。');}catch(err){toast(err.message);}return;
     }
   }));
   document.querySelectorAll('[data-tab]').forEach(el=>el.addEventListener('click',()=>{if(state.page==='company')captureCompanyDraft();state.tab[state.page]=el.dataset.tab;render();}));
   document.querySelectorAll('[data-goal]').forEach(el=>el.addEventListener('click',()=>{state.goal=el.dataset.goal;document.querySelectorAll('[data-goal]').forEach(b=>b.classList.toggle('active',b===el));}));
-  document.querySelectorAll('[data-demo]').forEach(el=>el.addEventListener('click',async()=>{el.disabled=true;try{state.boot=await api('/api/demo',{method:'POST',body:{id:el.dataset.demo}});state.companyDraft=null;state.runId=null;state.run=null;state.tab.company='profile';render();toast('已载入案例财报与对应融资需求，请核对后开始分析。');}catch(err){toast(err.message);el.disabled=false;}}));
+  document.querySelectorAll('[data-demo]').forEach(el=>el.addEventListener('click',async()=>{el.disabled=true;try{state.boot=await api('/api/demo',{method:'POST',body:{id:el.dataset.demo}});state.companyDraft=null;state.run=null;state.tab.company='profile';
+  // 案例载入即自动生成一条历史分析：跟随该任务轮询，完成后自动刷新
+  if(state.boot.active_run_id){await loadRun(state.boot.active_run_id,true);navigate('execution');}
+  render();toast('已载入案例财报，分析已自动开始，可在历史分析中查看进度。');}catch(err){toast(err.message);el.disabled=false;}}));
   document.querySelectorAll('[data-run]').forEach(el=>el.addEventListener('click',async()=>{try{await loadRun(el.dataset.run,true);navigate(isComplete()?'delivery':'execution');}catch(err){toast(err.message);}}));
   document.querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>{state.filter=el.dataset.filter;render();}));
   document.querySelectorAll('[data-task]').forEach(el=>el.addEventListener('change',async()=>{try{const response=await api(`/api/runs/${state.run.id}`,{method:'PATCH',body:{tasks:[{id:el.dataset.task,completed:el.checked}]}});state.run=response;render();}catch(err){el.checked=!el.checked;toast(err.message);}}));
@@ -466,10 +631,53 @@ function bind(){
   document.querySelector('#review-input')?.addEventListener('change',async ev=>{try{state.run=await api(`/api/runs/${state.run.id}`,{method:'PATCH',body:{reviewed:ev.target.checked}});render();toast(state.run.reviewed?'已记录本次人工复核。':'已取消复核标记。');}catch(err){toast(err.message);}});
   document.querySelector('#knowledge-form')?.addEventListener('submit',ev=>{ev.preventDefault();state.query=new FormData(ev.currentTarget).get('query').trim();render();});
   document.querySelector('#question-form')?.addEventListener('submit',async ev=>{ev.preventDefault();const f=new FormData(ev.currentTarget),question=f.get('question').trim();if(!question)return;const button=ev.currentTarget.querySelector('button[type=submit]');button.disabled=true;button.innerHTML='<span class="spinner"></span>正在解释';try{const answer=await api(`/api/runs/${state.run.id}/question`,{method:'POST',body:{question,consent:f.get('consent')==='on'}});state.messages.push({role:'user',content:question},{role:'assistant',content:answer.answer});render();}catch(err){toast(err.message);button.disabled=false;button.innerHTML=icon('send')+'发送';}});
+  // 弹窗与抽屉：内部点击不冒泡，点击遮罩按归属关闭
+  document.querySelectorAll('.dialog,.drawer').forEach(panel=>panel.addEventListener('click',ev=>ev.stopPropagation()));
+  document.querySelectorAll('.dialog-backdrop').forEach(backdrop=>backdrop.addEventListener('click',ev=>{
+    if(ev.target!==backdrop)return;
+    if(backdrop.dataset.action==='auth-close')state.authOpen=false;
+    else{state.modelOpen=false;state.modelMode=null;state.modelEditing=null;state.modelForm=null;}
+    render();
+  }));
+  document.querySelector('.drawer-backdrop')?.addEventListener('click',ev=>{if(ev.target===ev.currentTarget){state.histOpen=false;render();}});
+  // 登录 / 注册：验证码错误或口令错误后自动换图并清空验证码输入
+  document.querySelector('#auth-form')?.addEventListener('submit',async ev=>{
+    ev.preventDefault();const form=ev.currentTarget,button=form.querySelector('[type=submit]');button.disabled=true;
+    // 注册时校验两次输入的密码一致，不一致则保留已填内容并刷新验证码
+    if(state.authTab==='register'&&form.auth_password2&&form.auth_password2.value!==form.auth_password.value){
+      document.querySelector('#auth-error').textContent='两次输入的密码不一致，请重新输入';
+      form.auth_password2.value='';form.captchaCode.value='';await loadCaptcha();button.disabled=false;return;
+    }
+    const body={username:form.auth_username.value.trim(),password:form.auth_password.value,captchaId:state.authCaptcha.id,captchaCode:form.captchaCode.value.trim()};
+    if(state.authTab==='register')body.nickname=form.auth_nickname?.value.trim()||'';
+    try{
+      const data=await api(state.authTab==='register'?'/api/auth/register':'/api/auth/login',{method:'POST',body});
+      saveAuth(data);state.authOpen=false;state.userMenuOpen=false;state.authDraft={username:'',password:'',nickname:''};
+      // 重新拉取 bootstrap：历史分析按账户合并，登录后立即可见该账号的分析记录
+      await refreshBoot();render();
+      toast(state.authTab==='register'?'注册成功，欢迎加入融智 FinBridge。':`欢迎回来，${data.user.nickname||data.user.username}。`);
+    }catch(err){
+      document.querySelector('#auth-error').textContent=err.message;
+      form.captchaCode.value='';await loadCaptcha();
+    }finally{button.disabled=false;}
+  });
+  // 模型配置：表单来自共享组件，值统一由 mpCollect 收集（编辑留空保留原值）
+  document.querySelector('#model-form')?.addEventListener('submit',async ev=>{
+    ev.preventDefault();const form=ev.currentTarget,button=form.querySelector('[type=submit]');button.disabled=true;
+    const wasEdit=!!state.modelEditing;
+    const body={...mpCollect(form),provider:state.modelForm.provider};
+    try{
+      const result=wasEdit?await api(`/api/ai/models/${state.modelEditing}`,{method:'PUT',body}):await api('/api/ai/models',{method:'POST',body});
+      state.models=result.models||await api('/api/ai/models');
+      state.modelMode=null;state.modelEditing=null;state.modelForm=null;await refreshBoot();render();
+      toast(wasEdit?'模型配置已保存。':'模型已添加，可点击「使用」切换。');
+    }catch(err){document.querySelector('#model-error').textContent=err.message;}
+    finally{button.disabled=false;}
+  });
 }
 
 window.addEventListener('popstate',()=>{state.page=routePage();state.mobile=false;render();});
-(async()=>{try{state.page=routePage();await refreshBoot();const id=state.runId||state.boot.active_run_id;if(id){try{await loadRun(id,true);}catch{state.runId=null;sessionStorage.removeItem('finbridge_run');}}render();}catch(err){document.querySelector('#app').innerHTML=`<div class="error-panel"><h2>暂时无法连接工作空间</h2><p>${e(err.message)}</p><button class="btn" id="reconnect">重新连接</button></div>`;document.querySelector('#reconnect').addEventListener('click',()=>location.reload());}})();
+(async()=>{try{state.page=routePage();if(state.auth.token){try{const me=await api('/api/auth/me');state.auth.user=me.user;localStorage.setItem(AUTH_USER_KEY,JSON.stringify(me.user));}catch{clearAuth();}}await refreshBoot();const id=state.runId||state.boot.active_run_id;if(id){try{await loadRun(id,true);}catch{state.runId=null;sessionStorage.removeItem('finbridge_run');}}render();}catch(err){document.querySelector('#app').innerHTML=`<div class="error-panel"><h2>暂时无法连接工作空间</h2><p>${e(err.message)}</p><button class="btn" id="reconnect">重新连接</button></div>`;document.querySelector('#reconnect').addEventListener('click',()=>location.reload());}})();
 
 window.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(state.dialogueExpanded){document.querySelector('#expand-dialogue')?.click();document.querySelector('#expand-dialogue')?.focus({preventScroll:true});}else if(state.mobile){document.querySelector('[data-action=close-menu]')?.click();document.querySelector('.menu-btn')?.focus({preventScroll:true});}});
 document.addEventListener('toggle',event=>{if(event.target.closest?.('#decision-chat'))requestAnimationFrame(updateDialogueHeight);},true);

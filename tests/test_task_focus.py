@@ -102,17 +102,3 @@ def test_api_receives_goal_and_server_computed_risk_in_plain_language_prompt():
     assert payload["analysis_goal"] == "风险分析"
     assert payload["calculated_task_focus"]["risk"]["threshold"]["cash_drop_limit"] is not None
     assert "大白话" in captured[0]["messages"][0]["content"]
-
-
-@pytest.mark.parametrize("goal,title",[("风险分析","先看哪里最容易出问题"),("方案比较","把几种借法放在一起比较")])
-def test_goal_specific_result_is_visible_on_portfolio_and_report_pages(goal,title):
-    from streamlit.testing.v1 import AppTest
-    run=make_run(goal)
-    app=AppTest.from_file("../app.py",default_timeout=20).run()
-    app.session_state["runs"]=[run]
-    app.session_state["active_run_id"]=run["id"]
-    app.session_state["task_checklists"]={run["id"]:run["outputs"]["prepare_deliverables"]["tasks"]}
-    for page in ("solutions","delivery"):
-        app.switch_page(f"app_pages/{page}.py").run()
-        assert not app.exception
-        assert any(s.value==title for s in app.subheader)

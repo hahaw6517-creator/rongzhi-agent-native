@@ -1,0 +1,19 @@
+name: finbridge
+
+services:
+    # 融智 Agent · 企业财务分析与融资决策（前后端一体，单容器）
+    # 对外固定监听 8787 端口（与 start-native.ps1 本地端口一致）；如需更换，直接改下面的 '8787:8000'，例如 '9090:8000'
+    agent:
+        image: finbridge:latest
+        container_name: finbridge
+        restart: unless-stopped
+        env_file:
+            - .env
+        ports:
+            - '8787:8000'
+        volumes:
+            # SQLite 会话/任务/对话数据落盘在具名卷 finbridge-data，容器重建不丢失
+            - finbridge-data:/app/storage
+
+volumes:
+    finbridge-data:

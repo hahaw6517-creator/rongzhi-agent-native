@@ -9,6 +9,7 @@ from finbridge.real_case import real_case
 from finbridge.web_api import create_app
 from finbridge.public_finance import public_profile
 from finbridge.workflow import DiligenceRun
+from conftest import settle
 
 
 def test_official_case_preserves_three_years_and_restatement():
@@ -41,7 +42,8 @@ def test_case_load_and_download_share_the_same_financial_values(tmp_path):
         reloaded=client.post('/api/demo',json={'id':'0'}).json()
         assert reloaded['profile']['requested_amount']==3e8
         assert reloaded['profile']['requested_months']==12
-        assert reloaded['active_run_id'] is None
+        # 案例载入自动生成历史分析任务
+        settle(client,reloaded['active_run_id'])
         assert client.post('/api/demo',json={'id':'3'}).status_code==400
         for mode in ('xlsx','csv'):
             reply=client.get('/api/template?real=1'+('&format=csv' if mode=='csv' else ''))
@@ -50,6 +52,23 @@ def test_case_load_and_download_share_the_same_financial_values(tmp_path):
             raw=parse_public_blocks(frames).iloc[0].to_dict()
             assert completeness(raw)['complete'] and not historical_issues(raw)
             assert [r['values'] for r in raw['financial_history']]==[r['values'] for r in b['data']['financial_history']]
+
+
+def test_repeated_demo_load_replaces_previous_auto_run(tmp_path):
+    """同一案例重复载入：未复核的旧同输入自动分析被替换，历史分析保持每案例一份；已复核的保留不替换。"""
+    with TestClient(create_app(database_path=tmp_path/'dedup.sqlite3')) as client:
+        first=client.post('/api/demo',json={'id':'0'}).json()
+        settle(client,first['active_run_id'])
+        second=client.post('/api/demo',json={'id':'0'}).json()
+        settle(client,second['active_run_id'])
+        ids=[r['id'] for r in client.get('/api/bootstrap').json()['runs']]
+        assert ids==[second['active_run_id']], '重复载入同案例应只保留最新一条自动分析'
+        # 已复核的分析视为正式资产：再次载入不替换，旧记录与新自动分析并存
+        assert client.patch('/api/runs/'+second['active_run_id'],json={'reviewed':True}).status_code==200
+        third=client.post('/api/demo',json={'id':'0'}).json()
+        settle(client,third['active_run_id'])
+        ids=[r['id'] for r in client.get('/api/bootstrap').json()['runs']]
+        assert set(ids)=={second['active_run_id'],third['active_run_id']}, '已复核记录不应被重复载入替换'
 
 
 def test_real_case_request_passes_the_existing_python_workflow():

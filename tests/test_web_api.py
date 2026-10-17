@@ -14,11 +14,12 @@ from starlette.testclient import TestClient
 
 from finbridge.config import Settings
 from finbridge import web_api
+from conftest import settle
 
 
 @pytest.fixture
 def app(tmp_path, monkeypatch):
-    monkeypatch.setattr(web_api, "load_settings", lambda: Settings(None, "https://api.example.test", "test-model"))
+    monkeypatch.setattr("finbridge.model_resolver.load_settings", lambda: Settings(None, "https://api.example.test", "test-model"))
     # This suite retains the historical API contract. Public-mode integration is
     # exercised separately in test_public_api.py with the production defaults.
     from finbridge.template import legacy_financial_template_xlsx,legacy_financial_template_csv
@@ -129,6 +130,10 @@ def test_demo_atomically_replaces_funding_inputs_and_preserves_channel_parameter
     response = client.post("/api/demo", json={"id": "0"})
     assert response.status_code == 200
     state = response.json()
+    # 案例载入自动生成一条历史分析，等待其完成后再切换下一个案例
+    finish_id = state["active_run_id"]
+    assert finish_id
+    settle(client, finish_id)
     assert state["profile"]["amount"] == 880_000
     assert state["profile"]["internal_funds"] == 30_000
     assert state["profile"]["purpose"] == "综合融资"
@@ -230,6 +235,7 @@ def test_demo_cases_and_incomplete_data_remain_truthful(client):
     assert response.status_code == 200
     assert response.json()["quality"]["coverage"] < 100
     assert response.json()["profile"]["receivables"] == "未确认"
+    settle(client, response.json()["active_run_id"])  # 案例自动分析完成后再手动发起风险排查
     run = finish(client, goal="风险排查")
     assert not run["outputs"]["simulate_repayment"]["available"]
     assert run["outputs"]["calculate_ratios"]["dscr"]["value"] is None
@@ -336,7 +342,7 @@ def test_same_origin_writes_and_json_validation(client):
 
 
 def test_ai_execution_uses_existing_planner_without_revealing_credentials(client, monkeypatch):
-    monkeypatch.setattr(web_api, "load_settings", lambda: Settings("secret-never-return", "https://api.example.test", "test-model"))
+    monkeypatch.setattr("finbridge.model_resolver.load_settings", lambda: Settings("secret-never-return", "https://api.example.test", "test-model"))
     def mock_agent(run, settings, progress):
         assert settings.api_key == "secret-never-return"
         run.result["mode"] = "AI 自主规划"
@@ -353,7 +359,7 @@ def test_result_questions_require_consent_and_use_task_snapshot(client, monkeypa
     url = "/api/runs/" + run["id"] + "/question"
     assert client.post(url, json={"question": "解释风险"}).status_code == 400
     assert client.post(url, json={"question": "解释风险", "consent": True}).status_code == 400
-    monkeypatch.setattr(web_api, "load_settings", lambda: Settings("secret", "https://api.example.test", "model"))
+    monkeypatch.setattr("finbridge.model_resolver.load_settings", lambda: Settings("secret", "https://api.example.test", "model"))
     class MockAgent:
         def __init__(self, settings):
             assert settings.api_key == "secret"
