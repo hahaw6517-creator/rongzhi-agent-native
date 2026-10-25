@@ -41,7 +41,7 @@ function annualForecastVisual(f){
  const d=state.run?.financial_analysis?.diagnostics,actual=d?.cash_reconciliation||[];
  const labels=[...actual.map(r=>r.year+'年'),p.target_year+'年（预测）'];
  const actuals=actual.map(r=>r.operating==null?null:r.operating/1e8);
- return finFigure('历史现金与下一年预测',finColumns(labels,[{name:'实际经营现金',values:[...actuals,null]},{name:'历史检验预测',values:[...actual.map(r=>r.year===v?.target_year?v.annual_operating/1e8:null),null],color:'#805aa0'},{name:'校正前预测',values:[...actual.map(()=>null),p.uncalibrated_operating/1e8],color:'#b17b31'},{name:'校正后预测',values:[...actual.map(()=>null),p.annual_operating/1e8],color:'#527fa7'}]),'最后一期为情景预测；历史检验预测仅使用其前两年数据。校正前后不代表置信区间，也没有逐月或长期预测。');
+ return finFigure('历史现金与下一年预测',finColumns(labels,[{name:'实际经营现金',values:[...actuals,null]},{name:'历史检验预测',values:[...actual.map(r=>r.year===v?.target_year?v.annual_operating/1e8:null),null],color:'#805aa0'},{name:'校正前预测',values:[...actual.map(()=>null),p.uncalibrated_operating/1e8],color:'#b17b31'},{name:'校正后预测',values:[...actual.map(()=>null),p.annual_operating/1e8],color:'#527fa7'}]),'历史检验展示前两年数据对第三年的预测；最后一组展示下一年度修正前后的预测，与实际经营现金对照查看。');
 }
 function annualFundingVisual(p){
  const f=p.funding,rows=p.composition.filter(c=>c.id!=='leasing').map(c=>({label:c.name+' · 本金',value:c.amount/1e8}));

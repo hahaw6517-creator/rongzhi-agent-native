@@ -150,6 +150,13 @@ input[type=file]::file-selector-button{border:0;border-radius:7px;background:#e6
 .main .decision-dialogue-log{min-height:120px}
 .main .decision-dialogue.expanded{overflow:auto}
 .main .decision-dialogue:has(.parameter-template[open]){overflow:auto}
+.forecast-steps{display:grid;gap:16px;margin:24px 0}
+.forecast-step{display:flex;gap:16px;padding:22px;background:#f3f7f3;border:1px solid #e0e9e2;border-radius:14px}
+.forecast-step>div{min-width:0;flex:1}.forecast-step h3{margin:0 0 12px}.forecast-step p{margin:10px 0}
+.forecast-step-number{display:flex;align-items:center;justify-content:center;flex:0 0 32px;height:32px;border-radius:50%;background:#dcecdf;color:#145b49;font-weight:700}
+.main .forecast-equation{font-size:18px;line-height:1.85;font-weight:600;color:#153d35;overflow-wrap:anywhere}
+.forecast-result strong{font-size:24px;color:#116c55}
+@media(max-width:600px){.forecast-step{padding:16px;gap:10px}.main .forecast-equation{font-size:16px}.forecast-step-number{flex-basis:26px;height:26px}}
 [data-report-download][aria-busy=true]{opacity:.75;cursor:progress;pointer-events:none}
 @media(max-height:780px) and (min-width:1101px){.main .decision-dialogue:not(.expanded){position:relative;top:0}}
 @media print{.sidebar,.topbar,.section-footer,#toast,.decision-dialogue{display:none!important}.shell{margin:0}.main{padding:0;max-width:none}.card,.decision-lead,.report-cover{box-shadow:none;break-inside:avoid}.data-scroll{overflow:visible;max-height:none}}

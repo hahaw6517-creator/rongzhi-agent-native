@@ -125,6 +125,43 @@ curl -I http://localhost:8787/healthz
 
 ### 升级新版本
 
+#### 从 GitHub 一条命令更新现有网站
+
+适用当前项目的 Linux + Docker Compose v2 部署：服务名 `agent`、镜像 `finbridge:latest`、容器名 `finbridge`，数据库持久化在 `/app/storage`。服务器需要 Git、Bash、`flock`，并能访问 GitHub、Docker 基础镜像和 Python 包源。
+
+**已有本仓库源码的服务器，首次执行：**
+
+```bash
+# 进入服务器上的 rongzhi-agent-native 仓库目录后执行
+git pull --ff-only && bash deploy/update.sh
+```
+
+**如果原来只上传了离线部署包，首次执行：**
+
+```bash
+git clone https://github.com/hahaw6517-creator/rongzhi-agent-native.git
+cd rongzhi-agent-native
+bash deploy/update.sh
+```
+
+原来的部署文件夹、`.env` 和 Compose 文件保留在原位置。脚本从运行中的容器读取原 Compose 路径和项目名，沿用原端口、网络、密钥配置及数据卷，无需把密钥复制到代码仓库。
+
+**之后每次更新，只在这个仓库目录执行：**
+
+```bash
+bash deploy/update.sh
+```
+
+执行流程：拉取 `origin/main` → 创建并校验 SQLite 备份 → 从源码构建镜像 → 重建 `agent` 容器 → 检查 `/healthz`、镜像版本和持久化挂载。备份保存在服务器仓库的 `tmp/server-backups/时间/`，该目录不上传 GitHub，包含账户和分析数据，请按私有备份保管。
+
+构建期间旧服务继续运行；切换容器时会短暂中断。脚本不会执行 `down -v` 或清理数据卷。重建或启动检查失败会尝试恢复旧镜像，数据库不会自动倒回备份。`/healthz` 验证服务启动，融资分析、模型问答与公网域名访问仍按下方验收表检查。
+
+如服务器有未提交的代码或 Compose 改动，脚本会停止，先由部署者保留并处理这些改动。容器自定义名称可用 `FINBRIDGE_CONTAINER=实际容器名 bash deploy/update.sh`。原 Compose 路径已删除、镜像名称或存储布局不同的部署会停止并提示，需先核对配置。
+
+Docker 的 `compose up` 会在镜像变化时重建容器并保留挂载卷：[官方说明](https://docs.docker.com/reference/cli/docker/compose/up/)。只执行 `git pull` 或 `docker compose restart` 不会把新的 Python/网页文件装进旧镜像。
+
+#### 继续使用离线镜像包
+
 将来有新版本时，会提供新的 `finbridge-images.tar`，在 `deploy` 目录执行：
 
 ```bash

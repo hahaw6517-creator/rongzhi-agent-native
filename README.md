@@ -43,6 +43,8 @@ HOST=0.0.0.0 PORT=8000 python web_app.py
 
 平台分配端口时使用平台的 `PORT`。支持 Docker 的平台直接选择根目录 `Dockerfile`，容器启动同一个原生入口。
 
+已有 Docker Compose 网站更新：在服务器上的本仓库 `main` 分支目录执行 `bash deploy/update.sh`。脚本拉取最新代码、备份 SQLite、构建镜像、沿用现有 Compose 配置重建服务并检查启动；启动失败尝试恢复旧镜像。首次取得脚本及离线部署转接见 [服务器更新说明](deploy/deploy.md#从-github-一条命令更新现有网站)。
+
 通过平台环境变量配置 `DEEPSEEK_API_KEY`、`BASE_URL`、`MODEL`，可选配置 `TAVILY_API_KEY`。变量示例见 `.env.example`；实际密钥不上传 GitHub。
 
 **模型管理**：管理员设置 `ADMIN_PASSWORD` 后访问 `/admin.html` 维护平台托管密钥（编辑留空保留原值，连通性测试一键核验）；用户在页首「模型设置」为本会话添加自己的 OpenAI 兼容配置。所有调用按「用户自配 → 平台托管 → 环境变量」优先级解析，密钥以 Fernet 加密落库（主密钥可用 `FINBRIDGE_ENC_KEY` 指定，缺省自动生成）。

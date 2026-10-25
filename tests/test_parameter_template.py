@@ -1,7 +1,7 @@
 from copy import deepcopy
 import json
 import pytest
-from finbridge.parameter_template import definitions,template_text,parse_template
+from finbridge.parameter_template import definitions,template_text,parse_template,current_values
 from finbridge.decision_chat import DecisionConversation
 from finbridge.real_case import real_case
 from finbridge.workflow import DiligenceRun
@@ -57,3 +57,55 @@ def test_many_independent_overrides_are_applied_together(run):
     p=out['scenarios'][0]['snapshot']['outputs']['optimize_financing_portfolio']
     assert p['algorithm']['cvar_alpha']==.9 and p['verification']['passed']
     assert p['annual_context']['delay_days']==10
+
+
+def prefilled(run,changes=None):
+    values={**current_values(run),**(changes or {})}
+    lines=['[参数调整]']
+    for d in definitions():
+        scale=1e8 if d['kind']=='money' else .01 if d['kind']=='percent' else 1
+        lines.append(f"{d['label']}（{d['unit']}）={values[d['key']]/scale:.12f}")
+    return '\n'.join(lines)
+
+
+def test_prefilled_template_uses_actual_forecast_and_channel_defaults(run):
+    values=current_values(run)
+    assert len(values)==30 and all(v is not None for v in values.values())
+    assert values['forecast_growth']==run['financial_analysis']['forecast']['history_prediction']['future']['growth']
+    for c in run['outputs']['optimize_financing_portfolio']['composition']:
+        if c['id']=='leasing':continue
+        assert values[c['id']+'_rate']==c['rate']
+        assert values[c['id']+'_limit']==c['capacity']
+    with pytest.raises(ValueError,match='与当前方案一致'):
+        parse_template(prefilled(run),run)
+
+
+def test_prefilled_batch_only_changes_edited_values_and_recalculates_caps(run):
+    changes=dict(requested_amount=5e8,assumed_rate=.06,cvar_weight=.3)
+    question=prefilled(run,changes)
+    before=deepcopy(run)
+    out=DecisionConversation(run,SETTINGS,client=ScriptedClient([[('recalculate_template',{})]])).respond(question)
+    assert run==before
+    scenario=out['scenarios'][0]
+    assert scenario['changes']==pytest.approx(changes)
+    assert len(scenario['parameter_items'])==3
+    new=scenario['snapshot']['outputs']['optimize_financing_portfolio']
+    assert new['verification']['passed']
+    credit=next(c for c in new['composition'] if c['id']=='credit')
+    old=next(c for c in run['outputs']['optimize_financing_portfolio']['composition'] if c['id']=='credit')
+    assert credit['rate']==pytest.approx(.06)
+    assert credit['capacity']>old['capacity']
+
+
+def test_prefilled_duplicate_unchanged_value_is_still_rejected(run):
+    with pytest.raises(ValueError,match='两次'):
+        parse_template(prefilled(run)+'\n'+prefilled(run).splitlines()[1],run)
+
+
+def test_explicit_zero_and_existing_overrides_are_preserved(run):
+    amended=deepcopy(run)
+    amended['input_profile'].update(credit_limit=0,secured_rate=.03)
+    values=current_values(amended)
+    assert values['credit_limit']==0 and values['secured_rate']==.03
+    result=parse_template(prefilled(amended,{'factoring_limit':0,'requested_amount':5e8}),amended)
+    assert result['changes']=={'requested_amount':5e8,'factoring_limit':0}

@@ -755,11 +755,7 @@ async def demo(request):
         raise _error("当前有分析任务正在执行，完成后再切换案例", 409)
     profile = _demo_profile(data, store.state(token)["profile"])
     store.update(token, data=data, profile=profile, source=_case_source(data),active_run_id=None)
-    # 载入真实案例立即纳入历史分析：Python 快速通道自动执行一条完整分析，可在历史分析中查看进度
-    # 同一企业重复载入时替换旧的未复核分析，保持每个企业在历史分析中仅一份最新记录
-    store.drop_duplicate_runs(token, data.get("company_name"), uid)
-    run = store.add_run(token, profile, "融资组合", False, uid)
-    request.app.state.executor.submit(_execute, store, token, run, False, uid)
+    # Loading only prepares editable inputs. The workbench starts analysis explicitly.
     return JSONResponse(_bootstrap(request))
 
 

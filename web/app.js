@@ -599,10 +599,11 @@ function bind(){
   }));
   document.querySelectorAll('[data-tab]').forEach(el=>el.addEventListener('click',()=>{if(state.page==='company')captureCompanyDraft();state.tab[state.page]=el.dataset.tab;render();}));
   document.querySelectorAll('[data-goal]').forEach(el=>el.addEventListener('click',()=>{state.goal=el.dataset.goal;document.querySelectorAll('[data-goal]').forEach(b=>b.classList.toggle('active',b===el));}));
-  document.querySelectorAll('[data-demo]').forEach(el=>el.addEventListener('click',async()=>{el.disabled=true;try{state.boot=await api('/api/demo',{method:'POST',body:{id:el.dataset.demo}});state.companyDraft=null;state.run=null;state.tab.company='profile';
-  // 案例载入即自动生成一条历史分析：跟随该任务轮询，完成后自动刷新
-  if(state.boot.active_run_id){await loadRun(state.boot.active_run_id,true);navigate('execution');}
-  render();toast('已载入案例财报，分析已自动开始，可在历史分析中查看进度。');}catch(err){toast(err.message);el.disabled=false;}}));
+  document.querySelectorAll('[data-demo]').forEach(el=>el.addEventListener('click',async()=>{el.disabled=true;try{state.boot=await api('/api/demo',{method:'POST',body:{id:el.dataset.demo}});
+  clearTimeout(pollTimer);state.companyDraft=null;state.upload=null;state.run=null;state.runId=null;state.messages=[];state.tab.company='profile';
+  state.decisionChat=null;state.decisionChatFor=null;state.decisionChatDraft='';state.decisionChatError='';sessionStorage.removeItem('finbridge_run');
+  navigate('workspace');document.querySelector('#task-card')?.scrollIntoView({block:'start'});
+  toast('案例已载入。请调整融资金额，再点击“开始完整分析”。');}catch(err){toast(err.message);el.disabled=false;}}));
   document.querySelectorAll('[data-run]').forEach(el=>el.addEventListener('click',async()=>{try{await loadRun(el.dataset.run,true);navigate(isComplete()?'delivery':'execution');}catch(err){toast(err.message);}}));
   document.querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>{state.filter=el.dataset.filter;render();}));
   document.querySelectorAll('[data-task]').forEach(el=>el.addEventListener('change',async()=>{try{const response=await api(`/api/runs/${state.run.id}`,{method:'PATCH',body:{tasks:[{id:el.dataset.task,completed:el.checked}]}});state.run=response;render();}catch(err){el.checked=!el.checked;toast(err.message);}}));
