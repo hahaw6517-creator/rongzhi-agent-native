@@ -190,6 +190,12 @@ def _read_demos() -> list[dict[str, Any]]:
     return [c['data'] for c in real_cases()]
 
 
+def _demo_choices(demos):
+    # Stable IDs preserve existing Kingsoft/Ninghu links; retired ID 0 is not reassigned.
+    ids = {'688111': '1', '600377': '2'}
+    return {ids.get(str(d.get('security_code')), str(i)): d for i, d in enumerate(demos)}
+
+
 def _case_source(data):
     from finbridge.real_case import is_real_case
     return ('真实算例 · ' if is_real_case(data) else '模拟案例 · ')+data['company_name']
@@ -678,7 +684,7 @@ def _bootstrap(request: Request) -> dict[str, Any]:
         from finbridge.data_contract import REQUIRED,rolling_years
         return dict(state,case_context=case_context(state['data']),quality=q,public_model=model,public_blocks=BLOCKS,public_required=list(REQUIRED),template_years=rolling_years(),labels=LABELS,fields=[k for k in PUBLIC_KEYS if k in FIELD_CATALOG],
             field_catalog={k:v for k,v in FIELD_CATALOG.items() if k in PUBLIC_KEYS},goals=GOALS,knowledge=KNOWLEDGE,
-            tools=[{"id":key,"label":v[0],"dependencies":list(v[1]),"description":v[2]} for key,v in public_tools.items()],model_configured=resolve_llm_settings(store,uid).api_configured,cases=[{"id":str(i),"name":d["company_name"],"description":(case_context(d) or {}).get('description','公开报表格式虚构案例')} for i,d in enumerate(demos)],runs=[_summary(run) for run in store.list_runs(token,uid)])
+            tools=[{"id":key,"label":v[0],"dependencies":list(v[1]),"description":v[2]} for key,v in public_tools.items()],model_configured=resolve_llm_settings(store,uid).api_configured,cases=[{"id":str(i),"name":d["company_name"],"description":(case_context(d) or {}).get('description','公开报表格式虚构案例')} for i,d in _demo_choices(demos).items()],runs=[_summary(run) for run in store.list_runs(token,uid)])
     return dict(state, quality=check_data(dict(state["data"], financing_need=state["profile"]["amount"], available_internal_funds=state["profile"]["internal_funds"])),
         labels=LABELS, fields=list(DATA_FIELDS), field_catalog=FIELD_CATALOG, goals=GOALS, knowledge=KNOWLEDGE,
         tools=[{"id": key, "label": label, "dependencies": list(dependencies), "description": description} for key, (label, dependencies, description) in TOOLS.items()],
@@ -747,10 +753,10 @@ async def run_restore(request):
 
 async def demo(request):
     payload = await _payload(request, {"id"})
-    demos=_read_demos()
-    if str(payload.get("id")) not in {str(i) for i in range(len(demos))}:
+    demos=_demo_choices(_read_demos())
+    if str(payload.get("id")) not in demos:
         raise _error("请选择有效的案例")
-    data = demos[int(payload["id"])]
+    data = demos[str(payload["id"])]
     store, token, uid = _store(request), _sid(request), _uid(request)
     if store.has_running(token, uid):
         raise _error("当前有分析任务正在执行，完成后再切换案例", 409)

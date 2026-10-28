@@ -31,44 +31,28 @@ def test_official_case_preserves_three_years_and_restatement():
 def test_case_load_and_download_share_the_same_financial_values(tmp_path):
     with TestClient(create_app(database_path=tmp_path/'case.sqlite3')) as client:
         b=client.get('/api/bootstrap').json()
-        assert len(b['cases'])==3 and b['source'].startswith('真实算例')
+        assert len(b['cases'])==2 and b['source'].startswith('真实算例')
+        assert b['data']['security_code']=='688111'
         assert len(b['data']['financial_history'])==3
-        assert b['profile']['requested_amount']==300000000
+        assert b['profile']['requested_amount']==3e8
         assert b['profile']['requested_months']==12
-        assert b['profile']['requested_purpose']=='经营周转'
-        assert '测试假设' in b['profile']['objective']
         assert b['public_model']['available'] and b['case_context']['sources']
-        client.post('/api/company',json={'data':b['data'],'profile':{'requested_amount':1e7,'requested_months':12}})
-        reloaded=client.post('/api/demo',json={'id':'0'}).json()
-        assert reloaded['profile']['requested_amount']==3e8
-        assert reloaded['profile']['requested_months']==12
-        # 案例载入自动生成历史分析任务
-        settle(client,reloaded['active_run_id'])
-        assert client.post('/api/demo',json={'id':'3'}).status_code==400
-        for mode in ('xlsx','csv'):
-            reply=client.get('/api/template?real=1'+('&format=csv' if mode=='csv' else ''))
-            assert reply.status_code==200
-            frames=pd.read_excel(io.BytesIO(reply.content),sheet_name=None,header=None) if mode=='xlsx' else {'财报':pd.read_csv(io.BytesIO(reply.content),header=None)}
-            raw=parse_public_blocks(frames).iloc[0].to_dict()
-            assert completeness(raw)['complete'] and not historical_issues(raw)
-            assert [r['values'] for r in raw['financial_history']]==[r['values'] for r in b['data']['financial_history']]
+        reloaded=client.post('/api/demo',json={'id':'1'}).json()
+        assert reloaded['active_run_id'] is None and reloaded['runs']==[]
+        assert client.post('/api/demo',json={'id':'0'}).status_code==400
+        reply=client.get('/api/template?case=1')
+        assert reply.status_code==200
+        raw=parse_public_blocks(pd.read_excel(io.BytesIO(reply.content),sheet_name=None,header=None)).iloc[0].to_dict()
+        assert completeness(raw)['complete'] and not historical_issues(raw)
+        assert [r['values'] for r in raw['financial_history']]==[r['values'] for r in b['data']['financial_history']]
 
 
-def test_repeated_demo_load_replaces_previous_auto_run(tmp_path):
-    """同一案例重复载入：未复核的旧同输入自动分析被替换，历史分析保持每案例一份；已复核的保留不替换。"""
-    with TestClient(create_app(database_path=tmp_path/'dedup.sqlite3')) as client:
-        first=client.post('/api/demo',json={'id':'0'}).json()
-        settle(client,first['active_run_id'])
-        second=client.post('/api/demo',json={'id':'0'}).json()
-        settle(client,second['active_run_id'])
-        ids=[r['id'] for r in client.get('/api/bootstrap').json()['runs']]
-        assert ids==[second['active_run_id']], '重复载入同案例应只保留最新一条自动分析'
-        # 已复核的分析视为正式资产：再次载入不替换，旧记录与新自动分析并存
-        assert client.patch('/api/runs/'+second['active_run_id'],json={'reviewed':True}).status_code==200
-        third=client.post('/api/demo',json={'id':'0'}).json()
-        settle(client,third['active_run_id'])
-        ids=[r['id'] for r in client.get('/api/bootstrap').json()['runs']]
-        assert set(ids)=={second['active_run_id'],third['active_run_id']}, '已复核记录不应被重复载入替换'
+def test_repeated_demo_load_waits_for_manual_analysis(tmp_path):
+    with TestClient(create_app(database_path=tmp_path/'manual.sqlite3')) as client:
+        for case in ('1','2','1'):
+            state=client.post('/api/demo',json={'id':case}).json()
+            assert state['active_run_id'] is None
+            assert state['runs']==[]
 
 
 def test_real_case_request_passes_the_existing_python_workflow():

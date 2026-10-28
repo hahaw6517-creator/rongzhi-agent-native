@@ -22,7 +22,7 @@ def real_case():
 
 def real_cases():
     from finbridge.working_capital_year import year_profile
-    cases=[real_case()]
+    cases=[]
     for slug in ('kingsoft','ninghu'):
         path=ROOT/'data/official_cases'/f'{slug}.json'
         if not path.exists():continue
@@ -31,13 +31,14 @@ def real_cases():
         c['description']='2023—2025年官方合并财报；统一3亿元净需求、12个月生产经营周转（演示假设）'
         record_path=ROOT/'data/official_cases/demo_verification.json'
         if record_path.exists():c['description']+='。'+json.loads(record_path.read_text(encoding='utf8')).get(slug,'')
-        c['notes'].append('与海天算例使用相同净融资金额、利率、费用和安全规则；不调整财报以制造渠道差异。')
+        c['notes'].append('两个演示案例使用相同净融资金额、利率、费用和安全规则；不调整财报以制造渠道差异。')
         if slug=='ninghu':c['notes'].append('本例用于展示模型边界：年度现金均匀分配、营业成本代理储备及历史结构压力可能较保守；未通过不等于企业实际月度现金不足或银行拒贷。')
         cases.append(c)
     return cases
 
 def find_real_case(data):
-    return next((c for c in real_cases() if all(data.get(k)==c['data'].get(k) for k in ('company_name','public_source'))),None)
+    # Keep source attribution for previously saved/uploaded Haitian reports.
+    return next((c for c in [*real_cases(),real_case()] if all(data.get(k)==c['data'].get(k) for k in ('company_name','public_source'))),None)
 
 def is_real_case(data):
     return find_real_case(data) is not None
