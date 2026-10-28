@@ -14,6 +14,7 @@ class Settings:
     api_key: str | None
     base_url: str
     model: str
+    protocol: str = "openai"
 
     @property
     def api_configured(self) -> bool:

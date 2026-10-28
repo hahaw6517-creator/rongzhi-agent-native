@@ -471,6 +471,7 @@ function render(){
  const root=document.querySelector('#app'),runKey=state.run?.id||'',company=state.boot.data.company_name;
  const sameView=root.dataset.viewPage===state.page&&root.dataset.viewRun===runKey&&root.dataset.viewCompany===company;
  const savedY=window.scrollY,oldLog=document.querySelector('#sme-chat-log'),savedLog=oldLog?.scrollTop;
+ const savedPanelScroll=sameView?document.querySelector('#decision-chat')?.scrollTop:0;
  const details=sameView?[...root.querySelectorAll('main details')].map(d=>({label:d.querySelector(':scope>summary')?.textContent.trim(),open:d.open})):[];
  const focused=sameView&&root.contains(document.activeElement)?document.activeElement:null;
  const focusId=focused?.id,selection=focused&&typeof focused.selectionStart==='number'?[focused.selectionStart,focused.selectionEnd]:null;
@@ -484,6 +485,7 @@ function render(){
  document.body.classList.toggle('sb-collapsed',state.sidebarCollapsed);
  bind();window.scrollTo({top:savedY,behavior:'instant'});
  const newLog=document.querySelector('#sme-chat-log');if(newLog&&savedLog!=null)newLog.scrollTop=savedLog;
+ if(savedPanelScroll!=null){const panel=document.querySelector('#decision-chat');if(panel)panel.scrollTop=savedPanelScroll;}
  if(focusId){const next=document.getElementById(focusId);next?.focus({preventScroll:true});if(next&&selection)try{next.setSelectionRange(...selection);}catch{}}
  updateDialogueHeight();
 }
@@ -505,7 +507,7 @@ async function refreshChatModels(){
   if(state.chatModelsLoaded)return;state.chatModelsLoaded=true;
   try{state.models=await api('/api/ai/models');render();}catch{}
 }
-function schedulePoll(){clearTimeout(pollTimer);pollTimer=setTimeout(async()=>{try{await loadRun(state.runId,true);if(isComplete()){await refreshBoot();toast('融资分析任务已完成，报告与行动清单已生成。');}if(state.page==='execution'||state.page==='workspace')render();}catch(err){toast(err.message);}},1200);}
+function schedulePoll(){clearTimeout(pollTimer);pollTimer=setTimeout(async()=>{try{await loadRun(state.runId,true);if(isComplete()&&state.run.status!=='执行中'){await refreshBoot();toast('融资分析任务已完成，报告与行动清单已生成。');}if(['execution','workspace','risk'].includes(state.page))render();}catch(err){toast(err.message);}},1200);}
 async function saveTask(start=false){
   const f=document.querySelector('#task-form');if(!f.reportValidity())return;
   const profile=taskProfile();state.busy=true;

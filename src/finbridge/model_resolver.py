@@ -19,17 +19,17 @@ def resolve_llm_settings(store, user_id: int | None) -> Settings:
         selected = None
         if user_id is not None:
             selected = db.execute(
-                "SELECT platform_id, base_url, model_id, api_key_enc FROM ai_model "
+                "SELECT platform_id, base_url, model_id, api_key_enc, protocol FROM ai_model "
                 "WHERE user_id=? AND is_selected=1 ORDER BY id DESC LIMIT 1", (user_id,)).fetchone()
         if selected and selected["platform_id"]:
             selected = db.execute(
-                "SELECT base_url, model_id, api_key_enc FROM ai_platform_model WHERE id=? AND enabled=1",
+                "SELECT base_url, model_id, api_key_enc, protocol FROM ai_platform_model WHERE id=? AND enabled=1",
                 (selected["platform_id"],)).fetchone()
         elif selected is None:
             selected = db.execute(
-                "SELECT base_url, model_id, api_key_enc FROM ai_platform_model WHERE enabled=1 "
+                "SELECT base_url, model_id, api_key_enc, protocol FROM ai_platform_model WHERE enabled=1 "
                 "ORDER BY sort_order, id LIMIT 1").fetchone()
     if selected and selected["api_key_enc"] and selected["base_url"] and selected["model_id"]:
         key = store.secret_box().decrypt(selected["api_key_enc"])
-        return Settings(api_key=key, base_url=selected["base_url"], model=selected["model_id"])
+        return Settings(api_key=key, base_url=selected["base_url"], model=selected["model_id"], protocol=selected["protocol"])
     return load_settings()

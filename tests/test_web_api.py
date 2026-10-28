@@ -130,10 +130,9 @@ def test_demo_atomically_replaces_funding_inputs_and_preserves_channel_parameter
     response = client.post("/api/demo", json={"id": "0"})
     assert response.status_code == 200
     state = response.json()
-    # 案例载入自动生成一条历史分析，等待其完成后再切换下一个案例
-    finish_id = state["active_run_id"]
-    assert finish_id
-    settle(client, finish_id)
+    # 案例只载入数据，融资需求由用户确认后再手动启动。
+    assert state["active_run_id"] is None
+    assert state["runs"] == []
     assert state["profile"]["amount"] == 880_000
     assert state["profile"]["internal_funds"] == 30_000
     assert state["profile"]["purpose"] == "综合融资"
@@ -235,7 +234,7 @@ def test_demo_cases_and_incomplete_data_remain_truthful(client):
     assert response.status_code == 200
     assert response.json()["quality"]["coverage"] < 100
     assert response.json()["profile"]["receivables"] == "未确认"
-    settle(client, response.json()["active_run_id"])  # 案例自动分析完成后再手动发起风险排查
+    assert response.json()["active_run_id"] is None
     run = finish(client, goal="风险排查")
     assert not run["outputs"]["simulate_repayment"]["available"]
     assert run["outputs"]["calculate_ratios"]["dscr"]["value"] is None
@@ -342,6 +341,7 @@ def test_same_origin_writes_and_json_validation(client):
 
 
 def test_ai_execution_uses_existing_planner_without_revealing_credentials(client, monkeypatch):
+    monkeypatch.setattr("finbridge.ai_insights.complete_text", lambda *args: "模型测试解读。")
     monkeypatch.setattr("finbridge.model_resolver.load_settings", lambda: Settings("secret-never-return", "https://api.example.test", "test-model"))
     def mock_agent(run, settings, progress):
         assert settings.api_key == "secret-never-return"
@@ -350,6 +350,13 @@ def test_ai_execution_uses_existing_planner_without_revealing_credentials(client
     monkeypatch.setattr(web_api, "run_task_agent", mock_agent)
     run = finish(client, use_ai=True)
     assert run["mode"] == "AI 自主规划"
+    assert {k: v["status"] for k, v in run["ai_insights"].items()} == {"financial": "completed", "risk": "completed"}
+    # Reloading a stored report must never invoke the model again.
+    def unexpected_call(*args):
+        pytest.fail("Report refresh triggered a paid call")
+    monkeypatch.setattr("finbridge.ai_insights.complete_text", unexpected_call)
+    for _ in range(3):
+        assert client.get('/api/runs/' + run['id']).json()['ai_insights'] == run['ai_insights']
     assert "secret-never-return" not in json.dumps(run)
     assert client.get("/api/bootstrap").json()["model_configured"] is True
 

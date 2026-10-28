@@ -42,6 +42,7 @@ from finbridge.template import financial_template_xlsx, financial_template_csv
 from finbridge.task_agent import run_task_agent
 from finbridge.secret_box import SecretBox, generate_master_key
 from finbridge.model_resolver import resolve_llm_settings
+from finbridge.ai_insights import generate_insight
 from finbridge.web_auth import (
     AuthStore, auth_captcha, auth_register, auth_login, auth_me,
     ai_providers, ai_models, ai_model_item, ai_model_select, ai_model_test,
@@ -864,19 +865,47 @@ async def template(request):
 
 
 def _execute(store: SessionStore, token: str, run: DiligenceRun, use_ai: bool, uid: int | None = None):
-    def progress(event):
+    settings = None
+    def persist():
         store.save_progress(token, deepcopy(run.result), uid=uid)
+    def progress(event):
+        persist()
+        if (settings and use_ai and run.result.get("financial_analysis") is not None
+                and "financial" not in run.result.get("ai_insights", {})):
+            generate_insight(run.result, settings, "financial", progress=persist)
     try:
-        result = run_task_agent(run, resolve_llm_settings(store, uid), progress=progress) if use_ai else run.local(progress)
+        if use_ai:
+            settings = resolve_llm_settings(store, uid)
+            run.result["ai_insights"] = {"risk": {"status": "pending"}}
+            if settings.protocol != "openai":
+                run.result["mode"] = "Python计算 · AI专业解读"
+        # The existing tool planner speaks OpenAI tools. Native Anthropic can
+        # interpret the same deterministic calculations without that planner.
+        result = run_task_agent(run, settings, progress=progress) if use_ai and settings.protocol == "openai" else run.local(progress)
     except Exception:
         run.result.update(status="执行失败", error="任务执行未完成，请检查企业数据后重试。已执行工具证据仍保留。")
         result = run.result
+    if use_ai and settings:
+        run.result = result
+        calculation_status = result["status"]
+        result["status"] = "执行中"
+        persist()
+        try:
+            if "financial" not in result.get("ai_insights", {}):
+                generate_insight(result, settings, "financial", progress=persist)
+            generate_insight(result, settings, "risk", progress=persist)
+        except Exception:
+            for section in ("financial", "risk"):
+                if result.get("ai_insights", {}).get(section, {}).get("status") != "completed":
+                    result.setdefault("ai_insights", {})[section] = dict(status="unavailable", text="", message="本次模型解读暂未完成，计算结果已保留。")
+        finally:
+            result["status"] = calculation_status
     if result.get("parent_run_id"):
         from finbridge.market_rules import effective_portfolio
         before=result.pop("_parent_funding",{})
         after=(effective_portfolio(result.get("outputs",{})) or {}).get("funding",{})
         result["revision_delta"]={k:after[k]-before[k] if before.get(k) is not None and after.get(k) is not None else None for k in ("gap","debt_total","unfunded_gap")}
-    store.save_progress(token, deepcopy(result), finished=True)
+    store.save_progress(token, deepcopy(result), finished=True, uid=uid)
 
 
 async def start_run(request):
